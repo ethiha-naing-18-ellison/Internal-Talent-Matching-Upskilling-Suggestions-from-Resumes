@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+pymupdf
+python-docx
+sentence-transformers
+faiss-cpu
+lightgbm
+scikit-learn
+numpy
+pandas
+spacy
+rapidfuzz
+pillow
+pdf2image
+pytesseract
+python-magic-bin==0.4.14; sys_platform == "win32"
+python-magic; sys_platform != "win32"

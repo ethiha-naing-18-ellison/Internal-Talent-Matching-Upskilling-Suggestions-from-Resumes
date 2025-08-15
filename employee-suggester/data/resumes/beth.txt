@@ -1,0 +1,4 @@
+SKILLS: Python, Scikit-learn, PyTorch, Docker, Linux
+EXPERIENCE: Trained classification models with scikit-learn and PyTorch; deployed via Docker and FastAPI
+PROJECTS: Image classifier with 85% accuracy; REST API for model inference
+EDUCATION: BEng Software Engineering, 2024

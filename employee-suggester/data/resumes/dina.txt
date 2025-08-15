@@ -1,0 +1,4 @@
+SKILLS: Python, Airflow, ETL, Spark, Docker
+EXPERIENCE: Orchestrated daily pipelines in Airflow; transformed data at scale with PySpark
+PROJECTS: Batch + incremental loads; S3 data lake setup
+EDUCATION: BSc Data Engineering, 2024

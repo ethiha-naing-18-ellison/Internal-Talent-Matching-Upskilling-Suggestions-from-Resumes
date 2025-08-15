@@ -1,0 +1,4 @@
+SKILLS: SQL, Excel, Pandas, Tableau
+EXPERIENCE: Built KPI dashboards; performed EDA; wrote complex SQL joins and window functions
+PROJECTS: Sales performance dashboard; churn analysis
+EDUCATION: BSc Information Systems, 2023

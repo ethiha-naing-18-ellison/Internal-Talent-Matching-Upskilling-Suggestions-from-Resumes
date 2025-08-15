@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pdb
+*.egg*
+*.manifest
+*.spec
+.env
+.venv/
+venv/
+env/
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data / caches
+*.sqlite
+*.db
+
+# Node (future UI)
+node_modules/
+dist/
+build/

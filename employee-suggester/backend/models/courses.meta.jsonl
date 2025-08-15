@@ -1,0 +1,5 @@
+{"id": "c-101", "text": "Practical Airflow. Topics: Airflow, ETL. Level: Beginner", "raw": {"id": "c-101", "title": "Practical Airflow", "topics": ["Airflow", "ETL"], "level": "Beginner", "link": "https://example.com/airflow"}}
+{"id": "c-102", "text": "Docker for ML. Topics: Docker. Level: Beginner", "raw": {"id": "c-102", "title": "Docker for ML", "topics": ["Docker"], "level": "Beginner", "link": "https://example.com/docker-ml"}}
+{"id": "c-103", "text": "SQL for Analytics. Topics: SQL. Level: Beginner", "raw": {"id": "c-103", "title": "SQL for Analytics", "topics": ["SQL"], "level": "Beginner", "link": "https://example.com/sql-analytics"}}
+{"id": "c-104", "text": "PyTorch Basics. Topics: PyTorch. Level: Beginner", "raw": {"id": "c-104", "title": "PyTorch Basics", "topics": ["PyTorch"], "level": "Beginner", "link": "https://example.com/pytorch-basics"}}
+{"id": "c-105", "text": "FastAPI for APIs. Topics: REST API, FastAPI. Level: Beginner", "raw": {"id": "c-105", "title": "FastAPI for APIs", "topics": ["REST API", "FastAPI"], "level": "Beginner", "link": "https://example.com/fastapi"}}

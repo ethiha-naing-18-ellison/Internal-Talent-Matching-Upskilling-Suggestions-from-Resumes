@@ -1,0 +1,4 @@
+SKILLS: Python, SQL, Pandas, NumPy, Git
+EXPERIENCE: Built ETL scripts in Python; maintained PostgreSQL; basic Airflow exposure
+PROJECTS: Automated weekly data refresh for sales dashboard
+EDUCATION: BSc Computer Science, 2024

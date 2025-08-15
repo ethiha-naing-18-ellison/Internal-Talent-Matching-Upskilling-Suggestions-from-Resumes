@@ -1,0 +1,4 @@
+SKILLS: Python, TensorFlow, Keras, Git
+EXPERIENCE: Built deep learning models for text classification; experimented with BERT via Hugging Face
+PROJECTS: Sentiment classifier and report generator
+EDUCATION: BSc AI, 2024
