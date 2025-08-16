@@ -1117,10 +1117,10 @@
                 <p><strong>Jobs Database:</strong> <code>data/jobs/jobs.jsonl</code> - Contains detailed job descriptions and requirements</p>
                 <p><strong>Skills Taxonomy:</strong> <code>data/taxonomy/skills.csv</code> - Comprehensive list of technical and soft skills</p>
                 <div class="file-links">
-                    <a href="#" onclick="downloadJobs()" class="file-link">
+                    <a href="../data/jobs/jobs.jsonl" download="jobs.jsonl" class="file-link">
                         <i class="fas fa-download"></i> Download Jobs Data
                     </a>
-                    <a href="#" onclick="downloadSkills()" class="file-link">
+                    <a href="../data/taxonomy/skills.csv" download="skills.csv" class="file-link">
                         <i class="fas fa-download"></i> Download Skills Data
                     </a>
                 </div>
@@ -1421,8 +1421,22 @@ PROJECTS: Churn analysis, Next.js dashboard, Airflow pipelines`;
             document.getElementById('resume').value = t;
         }
 
-        function downloadSkills(){ window.location.href = '/data/taxonomy/skills.csv'; }
-        function downloadJobs(){ window.location.href = '/data/jobs/jobs.jsonl'; }
+        function downloadSkills(){ 
+            const link = document.createElement('a');
+            link.href = '../data/taxonomy/skills.csv';
+            link.download = 'skills.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        function downloadJobs(){ 
+            const link = document.createElement('a');
+            link.href = '../data/jobs/jobs.jsonl';
+            link.download = 'jobs.jsonl';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 
     <footer class="site-footer" id="footer">
@@ -1449,8 +1463,8 @@ PROJECTS: Churn analysis, Next.js dashboard, Airflow pipelines`;
                 <ul>
                     <li><a href="http://127.0.0.1:8001/docs" target="_blank" rel="noopener">FastAPI docs</a></li>
                     <li><a href="https://github.com/your/repo" target="_blank" rel="noopener">GitHub</a></li>
-                    <li><a href="#" onclick="downloadSkills()">Download skills.csv</a></li>
-                    <li><a href="#" onclick="downloadJobs()">Download jobs.jsonl</a></li>
+                    <li><a href="../data/taxonomy/skills.csv" download="skills.csv">Download skills.csv</a></li>
+                    <li><a href="../data/jobs/jobs.jsonl" download="jobs.jsonl">Download jobs.jsonl</a></li>
                 </ul>
             </nav>
 
