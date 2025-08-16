@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,16 +7,23 @@ from .ingest import parse_resume_file
 
 app = FastAPI(title="Employee Suggester — Ingestion API")
 
+allowed = os.getenv("ALLOWED_ORIGINS", "*")
+origins = ["*"] if allowed.strip() == "*" else [o.strip() for o in allowed.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # dev only
-    allow_methods=["*"],
+    allow_origins=origins,
+    allow_methods=["GET","POST","OPTIONS"],
     allow_headers=["*"],
 )
 
 @app.get("/")
 def root():
     return {"status": "ok", "message": "Employee Suggester API (ingestion ready)"}
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
 
 @app.post("/ingest_resume")
 async def ingest_resume(file: UploadFile = File(...)):

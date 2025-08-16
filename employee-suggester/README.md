@@ -77,3 +77,12 @@ python scripts/quick_test.py
 
 - **Step 4:** Retrieval + scoring (similarity + skill overlap) + explanations  
 - **Step 5:** LightGBM ranker (learning-to-rank) and evaluation (nDCG@5)
+
+## Deploy (Render + Netlify)
+- API: Render Blueprint (render.yaml). It installs deps and runs `python -m scripts.build_indices` at build, then starts Uvicorn on `$PORT`.
+- Config:
+  - EMBED_MODEL (default: sentence-transformers/all-MiniLM-L6-v2)
+  - ALLOWED_ORIGINS (comma-separated, set to your Netlify URL for production)
+- UI: Deploy `ui/` to Netlify. In the published page, set API via:
+  - Click "Set API URL" → paste your Render URL (e.g., https://employee-suggester-api.onrender.com), or
+  - Put it in `<meta name="api-base" content="https://…onrender.com">` and redeploy.

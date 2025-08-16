@@ -1,17 +1,9 @@
 fastapi
 uvicorn[standard]
-pymupdf
-python-docx
 sentence-transformers
-faiss-cpu
-lightgbm
-scikit-learn
+faiss-cpu==1.8.0.post1
 numpy
 pandas
-spacy
-rapidfuzz
-pillow
-pdf2image
-pytesseract
-python-magic-bin==0.4.14; sys_platform == "win32"
-python-magic; sys_platform != "win32"
+pymupdf
+python-docx
+requests

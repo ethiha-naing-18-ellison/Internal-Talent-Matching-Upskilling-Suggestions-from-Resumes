@@ -33,6 +33,9 @@
 
     <!-- Performance hints (optional) -->
     <link rel="preconnect" href="http://127.0.0.1:8001" crossorigin>
+    
+    <!-- API Configuration -->
+    <meta name="api-base" content="">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -951,6 +954,7 @@
             <div class="actions">
                 <button class="btn btn-primary" onclick="document.getElementById('file').click()">Upload resume</button>
                 <button class="btn btn-ghost" onclick="fillSample()">Use sample</button>
+                <button class="btn btn-ghost" onclick="setApiBase()">Set API URL</button>
             </div>
         </div>
     </header>
@@ -1194,7 +1198,20 @@
     </main>
 
     <script>
-        const API = "http://127.0.0.1:8001";
+        const META_API = document.querySelector('meta[name="api-base"]')?.content?.trim();
+        const STORED_API = localStorage.getItem('API_BASE');
+        const DEFAULT_API = "http://127.0.0.1:8001";
+        window.API_BASE = STORED_API || META_API || DEFAULT_API;
+        const API = window.API_BASE;
+
+        // tiny UI to set API at runtime (optional)
+        function setApiBase(){
+          const url = prompt("API base URL:", API);
+          if (!url) return;
+          localStorage.setItem('API_BASE', url);
+          alert("Saved. Reloading...");
+          location.reload();
+        }
 
         // File drag & drop functionality
         const fileUploadArea = document.querySelector('.file-upload-area');

@@ -1,0 +1,15 @@
+services:
+- type: web
+  name: employee-suggester-api
+  runtime: python
+  plan: free
+  autoDeploy: true
+  buildCommand: |
+    pip install -r requirements.txt
+    python -m scripts.build_indices
+  startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT --no-access-log
+  envVars:
+  - key: EMBED_MODEL
+    value: sentence-transformers/all-MiniLM-L6-v2
+  - key: ALLOWED_ORIGINS
+    value: "*"   # after Netlify is live, replace with your Netlify URL

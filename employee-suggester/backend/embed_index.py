@@ -1,11 +1,19 @@
-from typing import List, Dict, Tuple
-from pathlib import Path
-import json
-import numpy as np
-import faiss
+import os
 from sentence_transformers import SentenceTransformer
+from pathlib import Path
+import faiss
+import numpy as np
+import json
+from typing import List, Dict, Tuple
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+MODEL_NAME = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+_MODEL = None
+
+def _get_model():
+    global _MODEL
+    if _MODEL is None:
+        _MODEL = SentenceTransformer(MODEL_NAME)
+    return _MODEL
 
 def _normalize(vecs: np.ndarray) -> np.ndarray:
     norms = np.linalg.norm(vecs, axis=1, keepdims=True) + 1e-12
@@ -29,7 +37,7 @@ def build_index(items: List[Dict], text_fn, out_dir: str, name: str) -> Tuple[st
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    model = SentenceTransformer(MODEL_NAME)
+    model = _get_model()
     texts = [text_fn(it) for it in items]
     emb = model.encode(texts, batch_size=32, show_progress_bar=True)
     emb = _normalize(emb.astype("float32"))
@@ -49,14 +57,6 @@ def build_index(items: List[Dict], text_fn, out_dir: str, name: str) -> Tuple[st
 
 def load_index(index_path: str):
     return faiss.read_index(index_path)
-
-# Keep a tiny global cache to avoid reloading the model repeatedly in scripts
-_model_cache = None
-def _get_model():
-    global _model_cache
-    if _model_cache is None:
-        _model_cache = SentenceTransformer(MODEL_NAME)
-    return _model_cache
 
 def encode_query(text: str):
     model = _get_model()
