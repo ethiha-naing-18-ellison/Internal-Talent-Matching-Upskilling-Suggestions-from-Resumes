@@ -1,28 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TalentMatch AI - Smart Career Recommendations</title>
+    <!-- Primary SEO -->
+    <title>Employee Suggester – Match Your Resume to Roles (MVP)</title>
+    <meta name="description" content="Paste a resume and instantly get suggested roles with matched & missing skills. Supports PDF/DOCX/TXT. Open-source MVP.">
+    <link rel="canonical" href="http://127.0.0.1:8080/">
+
+    <!-- Basic Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="color-scheme" content="light dark">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Employee Suggester – Match Your Resume to Roles">
+    <meta property="og:description" content="Paste a resume and get role suggestions with skill gaps.">
+    <meta property="og:url" content="http://127.0.0.1:8080/">
+    <meta property="og:image" content="http://127.0.0.1:8080/og-image.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Employee Suggester – Match Your Resume to Roles">
+    <meta name="twitter:description" content="Instant role suggestions from your resume.">
+    <meta name="twitter:image" content="http://127.0.0.1:8080/og-image.png">
+
+    <!-- PWA / Icons (optional, but nice) -->
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Performance hints (optional) -->
+    <link rel="preconnect" href="http://127.0.0.1:8001" crossorigin>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"SoftwareApplication",
+      "name":"Employee Suggester",
+      "applicationCategory":"BusinessApplication",
+      "operatingSystem":"Web",
+      "description":"Paste a resume and get suggested roles with matched & missing skills.",
+      "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+      "creator":{"@type":"Organization","name":"Employee Suggester"}
+    }
+    </script>
+    
     <style>
         :root {
-            --primary: #667eea;
-            --primary-dark: #5a67d8;
-            --secondary: #764ba2;
-            --accent: #f093fb;
-            --success: #48bb78;
-            --warning: #ed8936;
-            --error: #f56565;
-            --bg-light: #f7fafc;
-            --bg-white: #ffffff;
-            --text-dark: #2d3748;
-            --text-gray: #4a5568;
-            --text-light: #718096;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --bg: #0f172a;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --primary: #0ea5e9;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-light: #1e293b;
+            --bg-white: #1e293b;
+            --text-dark: #f1f5f9;
+            --text-gray: #cbd5e1;
+            --text-light: #94a3b8;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
             --radius: 12px;
             --radius-lg: 16px;
         }
@@ -35,8 +80,8 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--bg-light) 0%, #e6fffa 100%);
-            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--bg) 0%, #1e293b 100%);
+            color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
         }
@@ -99,7 +144,7 @@
         }
 
         .card {
-            background: var(--bg-white);
+            background: var(--bg-light);
             border-radius: var(--radius-lg);
             padding: 2rem;
             box-shadow: var(--shadow);
@@ -200,7 +245,8 @@
             font-size: 0.875rem;
             resize: vertical;
             transition: border-color 0.3s ease;
-            background: var(--bg-white);
+            background: var(--bg);
+            color: var(--text);
         }
 
         #resume:focus {
@@ -236,6 +282,8 @@
             border-radius: var(--radius);
             font-family: 'Inter', sans-serif;
             text-align: center;
+            background: var(--bg);
+            color: var(--text);
         }
 
         /* Buttons */
@@ -256,7 +304,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--primary);
             color: white;
             box-shadow: var(--shadow);
         }
@@ -267,7 +315,7 @@
         }
 
         .btn-success {
-            background: linear-gradient(135deg, var(--success), #38a169);
+            background: var(--success);
             color: white;
             box-shadow: var(--shadow);
         }
@@ -346,7 +394,7 @@
 
         /* Table */
         .table-container {
-            background: var(--bg-white);
+            background: var(--bg-light);
             border-radius: var(--radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow);
@@ -376,7 +424,7 @@
         }
 
         .table tbody tr:hover {
-            background: rgba(102, 126, 234, 0.05);
+            background: rgba(14, 165, 233, 0.1);
         }
 
         .table tbody tr:last-child td {
@@ -437,6 +485,9 @@
             text-align: center;
             padding: 3rem;
             color: var(--text-light);
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
         }
 
         .empty-icon {
@@ -529,22 +580,395 @@
         .notification.error {
             background: var(--error);
         }
+
+        /* New Design System Styles */
+        .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+        .skip-link:focus{left:12px;top:12px;width:auto;height:auto;padding:8px 12px;background:#000;color:#fff;border-radius:8px}
+        .site-header{position:sticky;top:0;background:var(--bg-light);border-bottom:1px solid var(--border);z-index:10}
+        .site-header .container{display:flex;align-items:center;gap:16px;height:64px}
+        .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+        .logo{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--primary);color:#fff;font-weight:800}
+        .brand-name{color:inherit;text-decoration:none}
+        .nav{display:flex;gap:16px;margin-left:auto}
+        .nav a{color:var(--text);text-decoration:none}
+        .actions{display:flex;gap:8px}
+        .hero{padding:40px 0;border-bottom:1px solid var(--border)}
+        .hero h1{margin:0 0 8px;font-size:28px}
+        .hero p{margin:0 0 12px;color:var(--muted)}
+        .cta-row{display:flex;gap:10px;margin:8px 0 4px}
+        
+        /* Header and Hero Button Styles */
+        .actions .btn, .cta-row .btn {
+            padding:10px 14px;
+            border-radius:10px;
+            border:1px solid var(--border);
+            background:var(--bg-light);
+            color: var(--text);
+            cursor:pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .actions .btn-primary, .cta-row .btn-primary {
+            background:var(--primary);
+            color:#fff;
+            border-color:var(--primary);
+        }
+        .actions .btn-secondary, .cta-row .btn-secondary {
+            background:#111;
+            color:#fff;
+            border-color:#111;
+        }
+        .actions .btn-ghost, .cta-row .btn-ghost {
+            background:transparent;
+        }
+
+        .site-footer{margin-top:40px;padding:28px 0;border-top:1px solid var(--border);background:var(--bg)}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:20px}
+        .footer-grid h4{margin:.2rem 0 .4rem}
+        .footer-grid ul{list-style:none;padding:0;margin:0}
+        .footer-grid li{margin:.3rem 0}
+        .tiny{font-size:0.75rem;color:var(--muted);margin-top:0.5rem}
+        
+        /* Informational Sections Styling */
+        .info-section {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .info-section h2 {
+            color: var(--text-dark);
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .info-section h2::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: 2px;
+        }
+        
+        /* How it works section */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .step-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .step-card h3 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-card p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        /* Features section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .feature-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h3 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-card p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        /* Dataset section */
+        .dataset-info {
+            background: linear-gradient(135deg, #0c4a6e, #075985);
+            border: 1px solid #0ea5e9;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .dataset-info p {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .dataset-info code {
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .file-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        
+        .file-link:hover {
+            background: #0284c7;
+        }
+        
+        /* API section */
+        .api-endpoints {
+            margin-top: 1rem;
+        }
+        
+        .endpoint {
+            background: #1e293b;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+        
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-right: 0.75rem;
+        }
+        
+        .method-post {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .method-get {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+        
+        .endpoint-description {
+            margin-top: 0.5rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        
+        .docs-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--success);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .docs-link:hover {
+            background: #15803d;
+        }
+        
+        /* FAQ section */
+        .faq-list {
+            margin-top: 1rem;
+        }
+        
+        .faq-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .faq-item details {
+            cursor: pointer;
+        }
+        
+        .faq-item summary {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .faq-item summary::after {
+            content: '+';
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item[open] summary::after {
+            transform: rotate(45deg);
+        }
+        
+        .faq-answer {
+            padding: 1rem 1.5rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+            background: var(--bg-light);
+        }
+        
+        @media (max-width:900px){ 
+            .nav{display:none} 
+            .footer-grid{grid-template-columns:1fr 1fr}
+            .steps-grid, .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .file-links {
+                flex-direction: column;
+            }
+        }
+        @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <div>
-                    <h1 class="main-title">TalentMatch AI</h1>
-                    <p class="subtitle">Smart Career Recommendations Powered by AI</p>
-                </div>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <span class="logo">ES</span>
+                <a href="/" class="brand-name">Employee Suggester</a>
+            </div>
+            <nav class="nav" aria-label="Primary">
+                <a href="#how">How it works</a>
+                <a href="#features">Features</a>
+                <a href="#dataset">Jobs & Skills</a>
+                <a href="#api">API</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="document.getElementById('file').click()">Upload resume</button>
+                <button class="btn btn-ghost" onclick="fillSample()">Use sample</button>
             </div>
         </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Match your resume to real roles</h1>
+            <p>Paste your resume or upload a file. We'll suggest roles and show matched & missing skills.</p>
+            <div class="cta-row">
+                <button class="btn btn-primary" onclick="ingest()">Extract text from file</button>
+                <button class="btn btn-secondary" onclick="suggest()">Suggest roles</button>
+                <a class="btn btn-ghost" href="#api">View API</a>
+            </div>
+            <small>Supports PDF/DOCX/TXT • Local processing via your API</small>
+        </div>
+    </section>
+
+    <main id="main" class="container" style="margin:28px auto">
 
         <!-- Main Content -->
         <div class="main-content">
@@ -624,7 +1048,150 @@
             <h3>Ready to find your perfect role?</h3>
             <p>Upload your resume or paste your text above to get started with AI-powered career recommendations.</p>
         </div>
-    </div>
+
+        <!-- Informational Sections -->
+        <section id="how" class="info-section">
+            <h2><i class="fas fa-cogs"></i> How it works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Upload Resume</h3>
+                    <p>Upload or paste your resume in PDF, DOCX, or TXT format.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Extract & Embed</h3>
+                    <p>We extract skills and embed your text using advanced NLP.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Match Roles</h3>
+                    <p>We retrieve similar roles, then re-score by skill overlap.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Analyze Gaps</h3>
+                    <p>See matched vs missing skills; act on gaps to improve.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="info-section">
+            <h2><i class="fas fa-star"></i> Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3>Multi-format Support</h3>
+                    <p>Upload and process PDF, DOCX, and TXT files with intelligent text extraction.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                    <h3>Skill Matching</h3>
+                    <p>See exactly which skills you have and which ones are missing for each role.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Fast Local API</h3>
+                    <p>Lightning-fast processing with FastAPI backend and FAISS vector search.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Extensible Data</h3>
+                    <p>Easily customize jobs and skills taxonomy to match your industry needs.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dataset" class="info-section">
+            <h2><i class="fas fa-chart-line"></i> Jobs & Skills Taxonomy</h2>
+            <div class="dataset-info">
+                <p>Our system is built on comprehensive, editable datasets that you can customize for your specific needs:</p>
+                <p><strong>Jobs Database:</strong> <code>data/jobs/jobs.jsonl</code> - Contains detailed job descriptions and requirements</p>
+                <p><strong>Skills Taxonomy:</strong> <code>data/taxonomy/skills.csv</code> - Comprehensive list of technical and soft skills</p>
+                <div class="file-links">
+                    <a href="#" onclick="downloadJobs()" class="file-link">
+                        <i class="fas fa-download"></i> Download Jobs Data
+                    </a>
+                    <a href="#" onclick="downloadSkills()" class="file-link">
+                        <i class="fas fa-download"></i> Download Skills Data
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="api" class="info-section">
+            <h2><i class="fas fa-code"></i> API Reference</h2>
+            <div class="api-endpoints">
+                <div class="endpoint">
+                    <div>
+                        <span class="endpoint-method method-post">POST</span>
+                        <span class="endpoint-path">/ingest_resume</span>
+                    </div>
+                    <div class="endpoint-description">
+                        Upload a resume file (multipart/form-data) and extract text content. Returns parsed text ready for analysis.
+                    </div>
+                </div>
+                <div class="endpoint">
+                    <div>
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/suggest/roles?resume_text=...&topk=5</span>
+                    </div>
+                    <div class="endpoint-description">
+                        Get ranked job role suggestions based on resume text. Returns matched/missing skills for each role.
+                    </div>
+                </div>
+                <a href="http://127.0.0.1:8001/docs" target="_blank" rel="noopener" class="docs-link">
+                    <i class="fas fa-external-link-alt"></i> Open Interactive API Documentation
+                </a>
+            </div>
+        </section>
+
+        <section id="faq" class="info-section">
+            <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <details>
+                        <summary>What file formats are supported?</summary>
+                        <div class="faq-answer">
+                            Our system supports PDF, DOCX (Microsoft Word), and TXT (plain text) files. We use advanced document parsing to extract text content while preserving formatting and structure where possible.
+                        </div>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>Is my resume data secure and private?</summary>
+                        <div class="faq-answer">
+                            Absolutely! In this MVP version, all processing happens locally against your own API server. Your resume data never leaves your system or gets uploaded to any third-party service. Everything runs on your local machine.
+                        </div>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>How accurate are the role suggestions?</summary>
+                        <div class="faq-answer">
+                            Our matching algorithm uses advanced NLP and vector similarity search to find relevant roles. The accuracy depends on the quality of your resume content and our job database. We recommend providing detailed skill and experience information for best results.
+                        </div>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>Can I customize the job database?</summary>
+                        <div class="faq-answer">
+                            Yes! The system is designed to be extensible. You can edit the <code>data/jobs/jobs.jsonl</code> file to add your own job descriptions and the <code>data/taxonomy/skills.csv</code> file to customize the skills taxonomy to match your industry or organization.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script>
         const API = "http://127.0.0.1:8001";
@@ -697,7 +1264,7 @@
                 return;
             }
 
-            const button = document.querySelector('.btn-primary');
+            const button = document.querySelector('.card .btn-primary');
             setButtonLoading(button, true);
 
             try {
@@ -739,7 +1306,7 @@
                 return;
             }
 
-            const button = document.querySelector('.btn-success');
+            const button = document.querySelector('.controls .btn-success');
             setButtonLoading(button, true);
 
             try {
@@ -843,8 +1410,62 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('TalentMatch AI initialized');
+            console.log('Employee Suggester initialized');
         });
+
+        // Helper functions for new design
+        function fillSample(){
+            const t = `SKILLS: Python, SQL, React, Docker, Linux
+EXPERIENCE: Built REST APIs and ETL jobs; created dashboards; collaborated with product.
+PROJECTS: Churn analysis, Next.js dashboard, Airflow pipelines`;
+            document.getElementById('resume').value = t;
+        }
+
+        function downloadSkills(){ window.location.href = '/data/taxonomy/skills.csv'; }
+        function downloadJobs(){ window.location.href = '/data/jobs/jobs.jsonl'; }
+    </script>
+
+    <footer class="site-footer" id="footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="brand"><span class="logo">ES</span> Employee Suggester</div>
+                <p class="muted">Open-source MVP that suggests roles from a resume and highlights missing skills.</p>
+                <div class="tiny">© <span id="year"></span> Employee Suggester. All rights reserved.</div>
+            </div>
+
+            <nav aria-label="Quick links">
+                <h4>Quick links</h4>
+                <ul>
+                    <li><a href="#main">Try the demo</a></li>
+                    <li><a href="#how">How it works</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#dataset">Jobs & skills taxonomy</a></li>
+                    <li><a href="#api">API reference</a></li>
+                </ul>
+            </nav>
+
+            <nav aria-label="Resources">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="http://127.0.0.1:8001/docs" target="_blank" rel="noopener">FastAPI docs</a></li>
+                    <li><a href="https://github.com/your/repo" target="_blank" rel="noopener">GitHub</a></li>
+                    <li><a href="#" onclick="downloadSkills()">Download skills.csv</a></li>
+                    <li><a href="#" onclick="downloadJobs()">Download jobs.jsonl</a></li>
+                </ul>
+            </nav>
+
+            <nav aria-label="Legal">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#privacy">Privacy</a></li>
+                    <li><a href="#terms">Terms</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
     </script>
 </body>
 </html>
