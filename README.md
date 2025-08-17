@@ -86,3 +86,30 @@ python scripts/quick_test.py
 - UI: Deploy `ui/` to Netlify. In the published page, set API via:
   - Click "Set API URL" → paste your Render URL (e.g., https://employee-suggester-api.onrender.com), or
   - Put it in `<meta name="api-base" content="https://…onrender.com">` and redeploy.
+
+## Koyeb Deployment (Buildpacks)
+
+**Start command**
+```bash
+uvicorn employee-suggester.backend.app:app --host 0.0.0.0 --port $PORT --no-access-log
+```
+
+**Environment variables**
+
+PIP_EXTRA_INDEX_URL = https://download.pytorch.org/whl/cpu
+
+EMBED_MODEL = sentence-transformers/all-MiniLM-L6-v2
+
+HF_HOME = /app/.cache/hf
+
+ALLOWED_ORIGINS = *
+
+**Health check**
+
+Path: /healthz
+
+**Verify**
+
+Open /healthz → {"status":"ok"}
+
+Open /docs → FastAPI interactive docs

@@ -22,8 +22,8 @@ def root():
     return {"status": "ok", "message": "Employee Suggester API (ingestion ready)"}
 
 @app.get("/healthz")
-def healthz():
-    return {"ok": True}
+def health():
+    return {"status": "ok"}
 
 @app.post("/ingest_resume")
 async def ingest_resume(file: UploadFile = File(...)):
