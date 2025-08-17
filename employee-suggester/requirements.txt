@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sentence-transformers
+faiss-cpu==1.8.0.post1
+numpy
+pandas
+pymupdf
+python-docx
+requests
