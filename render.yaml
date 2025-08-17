@@ -1,23 +1,20 @@
 services:
-- type: web
-  name: employee-suggester-api
-  env: python
-  plan: free
-  rootDir: employee-suggester
-  pythonVersion: 3.10.13
-  buildCommand: |
-    pip install --upgrade pip
-    pip install -r requirements.txt
-  startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT --no-access-log
-  healthCheckPath: /healthz
-  envVars:
-    # make pip use the official CPU wheels for PyTorch
-    - key: PIP_EXTRA_INDEX_URL
-      value: https://download.pytorch.org/whl/cpu
-    # model + caching + CORS
-    - key: EMBED_MODEL
-      value: sentence-transformers/all-MiniLM-L6-v2
-    - key: HF_HOME
-      value: /opt/render/project/.cache/hf
-    - key: ALLOWED_ORIGINS
-      value: "*"
+  - type: web
+    name: employee-suggester-api
+    env: python
+    plan: free
+    rootDir: employee-suggester
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT --no-access-log
+    healthCheckPath: /healthz
+    envVars:
+      - key: PIP_EXTRA_INDEX_URL
+        value: https://download.pytorch.org/whl/cpu
+      - key: EMBED_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      - key: HF_HOME
+        value: /opt/render/project/.cache/hf
+      - key: ALLOWED_ORIGINS
+        value: "*"
