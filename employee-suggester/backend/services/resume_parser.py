@@ -288,17 +288,45 @@ class ResumeParser:
         education = []
         
         # Look for education section
-        education_patterns = [
-            r'(?i)(education|academic|degree|bachelor|master|phd)',
-            r'(?i)(university|college|institute)'
-        ]
-        
         lines = text.split('\n')
+        in_education_section = False
+        
         for line in lines:
             line = line.strip()
-            if any(pattern in line.lower() for pattern in education_patterns):
-                if line and len(line) > 5:  # Avoid very short lines
-                    education.append(line)
+            if not line:
+                continue
+            
+            # Check if we're entering an education section
+            if re.search(r'(?i)^education$|^academic$|^qualifications$', line):
+                in_education_section = True
+                continue
+            
+            # If we're in education section, look for degree patterns
+            if in_education_section:
+                # Look for degree patterns
+                degree_patterns = [
+                    r'(?i)(bachelor|master|phd|doctorate|diploma|certificate|foundation)',
+                    r'(?i)(computer science|engineering|business|arts|science)',
+                    r'(?i)(university|college|institute|school)'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in degree_patterns):
+                    if line and len(line) > 5 and line not in education:  # Avoid duplicates and short lines
+                        education.append(line)
+                        continue
+            
+            # Also look for degree patterns anywhere in the text (but only if not in education section)
+            if not in_education_section:
+                degree_patterns = [
+                    r'(?i)(bachelor|master|phd|doctorate|diploma|certificate|foundation)\s+of\s+',
+                    r'(?i)(bachelor|master|phd|doctorate|diploma|certificate|foundation)\s+in\s+',
+                    r'(?i)(computer science|engineering|business|arts|science)\s*[-–]\s*',
+                    r'(?i)(university|college|institute)\s*[-–]\s*'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in degree_patterns):
+                    if line and len(line) > 5 and line not in education:  # Avoid duplicates and short lines
+                        education.append(line)
         
         return education[:3]  # Limit to 3 education entries
     

@@ -1512,6 +1512,22 @@
                         </div>
                     </div>
                 </div>
+                
+                ${(profile.education || []).length > 0 ? `
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Academic Qualifications</h3>
+                        <div style="display: grid; gap: 0.75rem;">
+                            ${(profile.education || []).map(edu => `
+                                <div style="padding: 1rem; background: var(--bg); border-radius: var(--radius); border-left: 4px solid var(--primary);">
+                                    <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.25rem;">
+                                        <i class="fas fa-graduation-cap" style="margin-right: 0.5rem; color: var(--primary);"></i>
+                                        ${edu}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
             `;
             
             document.getElementById('profile-content').innerHTML = content;
