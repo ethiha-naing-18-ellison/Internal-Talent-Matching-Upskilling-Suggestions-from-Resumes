@@ -5,7 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from uuid import uuid4
 from .ingest import parse_resume_file
 
-app = FastAPI(title="Employee Suggester — Ingestion API")
+# Import new modular routes
+from .routes import health_router, parse_router, match_router, upskill_router, feedback_router
+
+app = FastAPI(title="Employee Suggester — Internal Talent Matching & Upskilling")
 
 allowed = os.getenv("ALLOWED_ORIGINS", "*")
 origins = ["*"] if allowed.strip() == "*" else [o.strip() for o in allowed.split(",") if o.strip()]
@@ -17,10 +20,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include new modular routes
+app.include_router(health_router)
+app.include_router(parse_router)
+app.include_router(match_router)
+app.include_router(upskill_router)
+app.include_router(feedback_router)
+
 @app.get("/")
 def root():
-    return {"status": "ok", "message": "Employee Suggester API (ingestion ready)"}
+    return {"status": "ok", "message": "Employee Suggester API (Internal Talent Matching & Upskilling)"}
 
+# Keep existing endpoints for backward compatibility
 @app.get("/healthz")
 def health():
     return {"status": "ok"}

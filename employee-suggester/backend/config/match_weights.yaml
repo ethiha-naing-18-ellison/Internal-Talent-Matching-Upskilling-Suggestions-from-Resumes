@@ -1,0 +1,8 @@
+weights:
+  skills: 0.55
+  experience: 0.25
+  domain: 0.15
+  location: 0.05
+thresholds:
+  min_match_score: 0.65
+  hard_constraints: ["location"]  # enforce equality before scoring

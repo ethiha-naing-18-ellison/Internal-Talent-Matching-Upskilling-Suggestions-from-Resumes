@@ -1,0 +1,5 @@
+features:
+  use_team_fit: false
+  use_faiss: false
+  use_explainability: true
+  enable_upskilling: true

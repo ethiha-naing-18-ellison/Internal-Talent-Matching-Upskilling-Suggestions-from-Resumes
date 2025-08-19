@@ -1,0 +1,4 @@
+app:
+  log_audit: true
+  redact_pii_in_logs: true
+  metrics_enabled: true

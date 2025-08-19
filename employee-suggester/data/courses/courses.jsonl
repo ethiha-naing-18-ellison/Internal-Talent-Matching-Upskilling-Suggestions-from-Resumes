@@ -1,5 +1,21 @@
-{"id":"c-101","title":"Practical Airflow","topics":["Airflow","ETL"],"level":"Beginner","link":"https://example.com/airflow"}
-{"id":"c-102","title":"Docker for ML","topics":["Docker"],"level":"Beginner","link":"https://example.com/docker-ml"}
-{"id":"c-103","title":"SQL for Analytics","topics":["SQL"],"level":"Beginner","link":"https://example.com/sql-analytics"}
-{"id":"c-104","title":"PyTorch Basics","topics":["PyTorch"],"level":"Beginner","link":"https://example.com/pytorch-basics"}
-{"id":"c-105","title":"FastAPI for APIs","topics":["REST API","FastAPI"],"level":"Beginner","link":"https://example.com/fastapi"}
+{"id":"C101","skill":"airflow","level":"beginner","hours":8,"provider":"FreeCodeCamp","cost":0,"prereqs":["python"]}
+{"id":"C102","skill":"airflow","level":"intermediate","hours":12,"provider":"Udemy","cost":49,"prereqs":["python"]}
+{"id":"C201","skill":"docker","level":"beginner","hours":6,"provider":"Coursera","cost":0,"prereqs":[]}
+{"id":"C202","skill":"docker","level":"intermediate","hours":10,"provider":"Pluralsight","cost":29,"prereqs":["docker"]}
+{"id":"C301","skill":"kubernetes","level":"beginner","hours":12,"provider":"Linux Academy","cost":49,"prereqs":["docker"]}
+{"id":"C302","skill":"kubernetes","level":"intermediate","hours":16,"provider":"A Cloud Guru","cost":59,"prereqs":["kubernetes"]}
+{"id":"C401","skill":"python","level":"beginner","hours":20,"provider":"Codecademy","cost":0,"prereqs":[]}
+{"id":"C402","skill":"python","level":"intermediate","hours":15,"provider":"Real Python","cost":39,"prereqs":["python"]}
+{"id":"C403","skill":"python","level":"advanced","hours":25,"provider":"Python Institute","cost":99,"prereqs":["python"]}
+{"id":"C501","skill":"machine learning","level":"beginner","hours":30,"provider":"Coursera","cost":0,"prereqs":["python"]}
+{"id":"C502","skill":"machine learning","level":"intermediate","hours":40,"provider":"Fast.ai","cost":0,"prereqs":["machine learning"]}
+{"id":"C601","skill":"sql","level":"beginner","hours":10,"provider":"SQLZoo","cost":0,"prereqs":[]}
+{"id":"C602","skill":"sql","level":"intermediate","hours":15,"provider":"DataCamp","cost":25,"prereqs":["sql"]}
+{"id":"C701","skill":"javascript","level":"beginner","hours":25,"provider":"freeCodeCamp","cost":0,"prereqs":[]}
+{"id":"C702","skill":"javascript","level":"intermediate","hours":20,"provider":"Eloquent JavaScript","cost":0,"prereqs":["javascript"]}
+{"id":"C801","skill":"react","level":"beginner","hours":18,"provider":"React Tutorial","cost":0,"prereqs":["javascript"]}
+{"id":"C802","skill":"react","level":"intermediate","hours":22,"provider":"React Patterns","cost":49,"prereqs":["react"]}
+{"id":"C901","skill":"aws","level":"beginner","hours":35,"provider":"AWS Training","cost":0,"prereqs":[]}
+{"id":"C902","skill":"aws","level":"intermediate","hours":45,"provider":"A Cloud Guru","cost":79,"prereqs":["aws"]}
+{"id":"C1001","skill":"nodejs","level":"beginner","hours":28,"provider":"Node.js Tutorial","cost":0,"prereqs":["javascript"]}
+{"id":"C1002","skill":"nodejs","level":"intermediate","hours":32,"provider":"Node.js Design Patterns","cost":59,"prereqs":["nodejs"]}
