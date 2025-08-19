@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <!-- Primary SEO -->
-    <title>Employee Suggester</title>
+    <title>Employee Suggester v1.2.0.0</title>
     <meta name="description" content="Paste a resume and instantly get suggested roles with matched & missing skills. Supports PDF/DOCX/TXT. Open-source MVP.">
     <link rel="canonical" href="http://127.0.0.1:8080/">
 
@@ -1007,17 +1007,20 @@
                 <div class="textarea-container">
                     <textarea id="resume" placeholder="Paste your resume text here or upload a file to auto-fill..."></textarea>
                 </div>
-                <div class="controls">
-                    <div class="input-group">
-                        <label for="k">Show top</label>
-                        <input id="k" type="number" value="5" min="1" max="20">
-                        <span>matches</span>
-                    </div>
-                    <button class="btn btn-success" onclick="suggest()">
-                        <i class="fas fa-search"></i>
-                        Find Matching Roles
-                    </button>
+                            <div class="controls">
+                <div class="input-group">
+                    <label for="k">Show top</label>
+                    <input id="k" type="number" value="5" min="1" max="20">
+                    <span>matches</span>
                 </div>
+                <div class="input-group">
+                    <span style="color: var(--muted); font-size: 0.875rem;">v1.2.0.0</span>
+                </div>
+                <button class="btn btn-success" onclick="suggest()">
+                    <i class="fas fa-search"></i>
+                    Find Matching Roles
+                </button>
+            </div>
             </div>
         </div>
 
@@ -1030,19 +1033,47 @@
                 <h2 class="results-title">Career Matches</h2>
                 <span id="results-count" class="results-count">0 results</span>
             </div>
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-briefcase"></i> Role</th>
-                            <th><i class="fas fa-star"></i> Match Score</th>
-                            <th><i class="fas fa-check-circle"></i> Your Skills</th>
-                            <th><i class="fas fa-exclamation-circle"></i> Skills to Learn</th>
-                        </tr>
-                    </thead>
-                    <tbody id="results-body">
-                    </tbody>
-                </table>
+            
+            <!-- Enhanced Results Tabs -->
+            <div id="enhanced-tabs" style="display: none; margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 0.5rem; background: var(--bg); border-radius: var(--radius); padding: 0.25rem; margin-bottom: 1rem;">
+                    <button class="tab-btn active" onclick="showTab('profile')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Profile</button>
+                    <button class="tab-btn" onclick="showTab('matches')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Job Matches</button>
+                    <button class="tab-btn" onclick="showTab('upskill')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Upskilling</button>
+                </div>
+                
+                <!-- Profile Tab -->
+                <div id="profile-tab" class="tab-content active" style="display: block;">
+                    <div id="profile-content"></div>
+                </div>
+                
+                <!-- Matches Tab -->
+                <div id="matches-tab" class="tab-content" style="display: none;">
+                    <div id="matches-content"></div>
+                </div>
+                
+                <!-- Upskilling Tab -->
+                <div id="upskill-tab" class="tab-content" style="display: none;">
+                    <div id="upskill-content"></div>
+                </div>
+            </div>
+            
+            <!-- Basic Results Table -->
+            <div id="basic-results">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-briefcase"></i> Role</th>
+                                <th><i class="fas fa-star"></i> Match Score</th>
+                                <th><i class="fas fa-check-circle"></i> Your Skills</th>
+                                <th><i class="fas fa-exclamation-circle"></i> Skills to Learn</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -1327,22 +1358,282 @@
             setButtonLoading(button, true);
 
             try {
-                const url = `${API}/suggest/roles?topk=${encodeURIComponent(k)}&resume_text=${encodeURIComponent(text)}`;
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error('Failed to get suggestions');
-                }
-
-                const result = await response.json();
-                renderResults(result.roles || []);
-                showNotification(`Found ${result.roles?.length || 0} career matches!`);
+                // First get basic results
+                const basicResult = await performBasicAnalysis(text, k);
+                
+                // Then get enhanced analysis for tabs
+                await performEnhancedAnalysis(text);
+                
             } catch (error) {
                 console.error('Suggestion error:', error);
                 showNotification('Failed to get suggestions. Please try again.', 'error');
             } finally {
                 setButtonLoading(button, false);
             }
+        }
+
+        // Enhanced analysis with structured parsing and upskilling
+        async function performEnhancedAnalysis(text) {
+            // Step 1: Parse resume
+            const profile = await parseResumeText(text);
+            
+            // Step 2: Get job matches
+            const matches = await getJobMatches(profile);
+            
+            // Step 3: Generate upskilling plans
+            const upskillPlans = await generateUpskillingPlans(matches);
+            
+            // Display enhanced results
+            displayEnhancedResults(profile, matches, upskillPlans);
+            showNotification(`Enhanced analysis complete! Found ${matches.matches?.length || 0} matches with upskilling plans.`);
+        }
+
+        // Basic analysis (original functionality)
+        async function performBasicAnalysis(text, k) {
+            const url = `${API}/suggest/roles?topk=${encodeURIComponent(k)}&resume_text=${encodeURIComponent(text)}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error('Failed to get suggestions');
+            }
+
+            const result = await response.json();
+            renderResults(result.roles || []);
+            showNotification(`Found ${result.roles?.length || 0} career matches!`);
+            return result;
+        }
+
+        // Parse resume text using new endpoint
+        async function parseResumeText(text) {
+            const response = await fetch(`${API}/parse_resume_json`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ raw_text: text })
+            });
+            
+            if (!response.ok) throw new Error('Resume parsing failed');
+            return await response.json();
+        }
+
+        // Get job matches using new endpoint
+        async function getJobMatches(profile) {
+            const jobsResponse = await fetch(`${API}/jobs`);
+            const jobs = await jobsResponse.json();
+            
+            const response = await fetch(`${API}/match`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    candidate: profile.profile,
+                    jobs: jobs.slice(0, 5)
+                })
+            });
+            
+            if (!response.ok) throw new Error('Job matching failed');
+            return await response.json();
+        }
+
+        // Generate upskilling plans
+        async function generateUpskillingPlans(matches) {
+            const gaps = [];
+            matches.matches.forEach(match => {
+                gaps.push(...match.gaps.map(gap => gap.split(':')[0].trim()));
+            });
+            
+            const uniqueGaps = [...new Set(gaps)];
+            
+            if (uniqueGaps.length === 0) {
+                return { plan: [] };
+            }
+
+            const response = await fetch(`${API}/upskill`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    target_role: "Data Engineer",
+                    gaps: uniqueGaps.slice(0, 3)
+                })
+            });
+            
+            if (!response.ok) throw new Error('Upskilling plan generation failed');
+            return await response.json();
+        }
+
+        // Display enhanced results
+        function displayEnhancedResults(profile, matches, upskillPlans) {
+            // Display profile
+            displayProfile(profile.profile);
+            
+            // Display matches
+            displayMatches(matches.matches);
+            
+            // Display upskilling plans
+            displayUpskillingPlans(upskillPlans.plan);
+        }
+
+        // Display profile information
+        function displayProfile(profile) {
+            if (!profile) {
+                document.getElementById('profile-content').innerHTML = `
+                    <div class="card">
+                        <h3 style="color: var(--text-dark);">Profile Analysis</h3>
+                        <p>Enhanced profile analysis is not available. Please use the basic results table above.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const content = `
+                <div class="card" style="margin-bottom: 1rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Structured Profile Analysis</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Basic Info</h4>
+                            <p><strong>Name:</strong> ${profile.name || 'Not detected'}</p>
+                            <p><strong>Location:</strong> ${profile.location || 'Not detected'}</p>
+                            <p><strong>Department:</strong> ${profile.dept || 'Not detected'}</p>
+                            <p><strong>Seniority:</strong> ${profile.seniority || 'Not detected'}</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Skills (${(profile.skills || []).length})</h4>
+                            <div class="skills">
+                                ${(profile.skills || []).map(skill => `
+                                    <span class="skill-tag skill-matched">${skill.name || skill} (Level ${skill.level || 'N/A'})</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('profile-content').innerHTML = content;
+        }
+
+        // Display enhanced matches
+        function displayMatches(matches) {
+            if (!matches || matches.length === 0) {
+                document.getElementById('matches-content').innerHTML = `
+                    <div class="card">
+                        <h3 style="color: var(--text-dark);">No Enhanced Matches</h3>
+                        <p>Enhanced matching analysis is not available. Please use the basic results table above.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const content = matches.map(match => {
+                const scoreClass = match.score >= 0.8 ? 'score-excellent' : 
+                                 match.score >= 0.6 ? 'score-good' : 'score-fair';
+                
+                const scoreIcon = match.score >= 0.8 ? 'fas fa-star' : 
+                                match.score >= 0.6 ? 'fas fa-thumbs-up' : 'fas fa-minus';
+
+                return `
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <h3 style="color: var(--text-dark);">${match.job_id || 'Unknown Job'}</h3>
+                            <div class="score ${scoreClass}">
+                                <i class="${scoreIcon}"></i>
+                                ${(match.score * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Why this match?</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                ${(match.reasons || []).map(reason => `
+                                    <li style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                                        <div style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
+                                            <i class="fas fa-info"></i>
+                                        </div>
+                                        <div style="flex: 1;">${reason.note || 'Match reason'}</div>
+                                        <div style="font-size: 0.75rem; color: var(--muted);">${(reason.weight * 100).toFixed(0)}%</div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        ${(match.gaps || []).length > 0 ? `
+                            <div style="margin-top: 1rem;">
+                                <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Skill Gaps</h4>
+                                <div class="skills">
+                                    ${match.gaps.map(gap => `
+                                        <span class="skill-tag skill-missing">${gap}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('matches-content').innerHTML = content;
+        }
+
+        // Display upskilling plans
+        function displayUpskillingPlans(plans) {
+            if (!plans || plans.length === 0) {
+                document.getElementById('upskill-content').innerHTML = `
+                    <div class="card">
+                        <h3 style="color: var(--text-dark);">Upskilling Recommendations</h3>
+                        <p>Enhanced upskilling analysis is not available. Please use the basic results table above to see skill gaps.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const content = plans.map(plan => `
+                <div class="card" style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="color: var(--text-dark);">${plan.skill || 'Skill'}</h3>
+                        <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">${plan.eta_weeks || 'N/A'} weeks</span>
+                    </div>
+                    
+                    <div>
+                        ${(plan.items || []).map(item => `
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg); border-radius: var(--radius); margin-bottom: 0.5rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: var(--text-dark);">${item.label || 'Learning Item'}</div>
+                                    <div style="font-size: 0.875rem; color: var(--muted);">
+                                        ${item.hours || 'N/A'} hours • ${item.type || 'Course'}
+                                        ${(item.prereqs || []).length > 0 ? ` • Prereqs: ${item.prereqs.join(', ')}` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('upskill-content').innerHTML = content;
+        }
+
+        // Tab switching function
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--muted)';
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+            event.target.classList.add('active');
+            event.target.style.background = 'var(--primary)';
+            event.target.style.color = 'white';
         }
 
         // Get score class for styling
@@ -1379,50 +1670,62 @@
                 return;
             }
 
+            // Show both basic results and enhanced tabs
+            document.getElementById('enhanced-tabs').style.display = 'block';
+            document.getElementById('basic-results').style.display = 'block';
+            
             emptyState.style.display = 'none';
             resultsSection.style.display = 'block';
             resultsSection.classList.add('fade-in');
             resultsCount.textContent = `${roles.length} result${roles.length !== 1 ? 's' : ''}`;
 
-            const html = roles.map(role => {
-                const scoreClass = getScoreClass(role.score);
-                const scoreIcon = getScoreIcon(role.score);
+            resultsBody.innerHTML = roles.map(role => `
+                <tr>
+                    <td>
+                        <div class="role-title">${role.title}</div>
+                        <div class="role-id">${role.id}</div>
+                    </td>
+                    <td>
+                        <div class="score ${getScoreClass(role.score)}">
+                            <i class="${getScoreIcon(role.score)}"></i>
+                            ${(role.score * 100).toFixed(1)}%
+                        </div>
+                    </td>
+                    <td>
+                        <div class="skills">
+                            ${role.matched_skills.map(skill => `
+                                <span class="skill-tag skill-matched">${skill}</span>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="skills">
+                            ${role.missing_skills.map(skill => `
+                                <span class="skill-tag skill-missing">${skill}</span>
+                            `).join('')}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-                const matchedSkills = (role.matched_skills || []).map(skill => 
-                    `<span class="skill-tag skill-matched">${skill}</span>`
-                ).join('');
+        // Tab switching function
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--muted)';
+            });
 
-                const missingSkills = (role.missing_skills || []).map(skill => 
-                    `<span class="skill-tag skill-missing">${skill}</span>`
-                ).join('');
-
-                return `
-                    <tr>
-                        <td>
-                            <div class="role-title">${role.title}</div>
-                            <div class="role-id">${role.job_id}</div>
-                        </td>
-                        <td>
-                            <div class="score ${scoreClass}">
-                                <i class="${scoreIcon}"></i>
-                                ${(role.score * 100).toFixed(1)}%
-                            </div>
-                        </td>
-                        <td>
-                            <div class="skills">
-                                ${matchedSkills || '<span class="skill-tag" style="background: #f7fafc; color: #a0aec0;">None</span>'}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="skills">
-                                ${missingSkills || '<span class="skill-tag" style="background: #f7fafc; color: #a0aec0;">None</span>'}
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            resultsBody.innerHTML = html;
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+            event.target.classList.add('active');
+            event.target.style.background = 'var(--primary)';
+            event.target.style.color = 'white';
         }
 
         // Initialize

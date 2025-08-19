@@ -24,13 +24,25 @@ class ResumeParser:
         if not raw_text or not raw_text.strip():
             return CandidateProfile()
         
-        text = clean_text(raw_text)
+        # Use raw text without preprocessing to preserve newlines
+        text = raw_text
+        # text = clean_text(raw_text)
         
         # Extract basic information
         name = self._extract_name(text)
         location = self._extract_location(text)
         dept = self._extract_department(text)
         seniority = self._extract_seniority(text)
+        
+        # Debug logging
+        print(f"DEBUG: Raw text: {repr(text)}")
+        print(f"DEBUG: Raw text first 5 lines: {text.split('\n')[:5]}")
+        print(f"DEBUG: Raw text length: {len(text)}")
+        print(f"DEBUG: Raw text contains 'THIHA': {'THIHA' in text}")
+        print(f"DEBUG: Raw text contains 'Address:': {'Address:' in text}")
+        print(f"DEBUG: Extracted name: '{name}'")
+        print(f"DEBUG: Extracted location: '{location}'")
+        print(f"DEBUG: Extracted dept: '{dept}'")
         
         # Extract skills
         skills = self._extract_skills(text)
@@ -79,44 +91,52 @@ class ResumeParser:
     
     def _extract_name(self, text: str) -> str:
         """Extract candidate name from resume text."""
-        # Simple heuristic: look for patterns like "Name: John Doe" or "JOHN DOE" at the top
-        lines = text.split('\n')[:10]  # Check first 10 lines
-        
-        for line in lines:
+        # Simple approach: look for all-caps name at the beginning
+        lines = text.split('\n')
+        for line in lines[:3]:  # Check first 3 lines
             line = line.strip()
             if not line:
                 continue
             
-            # Look for name patterns
-            if re.match(r'^[A-Z][a-z]+ [A-Z][a-z]+$', line):
-                return line
-            
-            # Look for "Name:" pattern
-            if 'name:' in line.lower():
-                name_part = line.split(':', 1)[1].strip()
-                if name_part:
-                    return name_part
+            # Look for all-caps name (2+ words)
+            if line.isupper() and len(line.split()) >= 2:
+                return line.title()
         
         return ""
     
     def _extract_location(self, text: str) -> str:
         """Extract location from resume text."""
-        # Common location patterns
-        location_patterns = [
-            r'\b(KL|Kuala Lumpur|JB|Johor Bahru|Penang|Malacca|Ipoh)\b',
-            r'\b(Singapore|Bangkok|Jakarta|Manila|Ho Chi Minh)\b',
-            r'\b(Remote|On-site|Hybrid)\b'
-        ]
-        
-        for pattern in location_patterns:
-            matches = re.findall(pattern, text, re.IGNORECASE)
-            if matches:
-                return matches[0]
+        # Simple approach: find the line that starts with "Address:"
+        lines = text.split('\n')
+        for line in lines:
+            line = line.strip()
+            if line.lower().startswith('address:'):
+                # Extract everything after "Address:"
+                address = line.split(':', 1)[1].strip()
+                # Remove any trailing parentheses like "(Work)"
+                if '(' in address:
+                    address = address.split('(')[0].strip()
+                return address
         
         return ""
     
     def _extract_department(self, text: str) -> str:
         """Extract department from resume text."""
+        # Look for job titles and roles first
+        job_title_patterns = [
+            r'\b(Data Analyst|Data Scientist|Data Engineer)\b',
+            r'\b(Software Engineer|Developer|Programmer)\b',
+            r'\b(Product Manager|Project Manager)\b',
+            r'\b(DevOps Engineer|System Administrator)\b',
+            r'\b(UX Designer|UI Designer|Designer)\b'
+        ]
+        
+        for pattern in job_title_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            if matches:
+                return matches[0]
+        
+        # Look for department keywords
         dept_patterns = [
             r'\b(IT|Information Technology|Software Engineering)\b',
             r'\b(Data|Analytics|Business Intelligence)\b',
