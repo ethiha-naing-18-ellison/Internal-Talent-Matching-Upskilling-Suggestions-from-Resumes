@@ -31,6 +31,8 @@ class ResumeParser:
         # Extract basic information
         name = self._extract_name(text)
         location = self._extract_location(text)
+        phone = self._extract_phone(text)
+        email = self._extract_email(text)
         dept = self._extract_department(text)
         seniority = self._extract_seniority(text)
         
@@ -42,6 +44,8 @@ class ResumeParser:
         print(f"DEBUG: Raw text contains 'Address:': {'Address:' in text}")
         print(f"DEBUG: Extracted name: '{name}'")
         print(f"DEBUG: Extracted location: '{location}'")
+        print(f"DEBUG: Extracted phone: '{phone}'")
+        print(f"DEBUG: Extracted email: '{email}'")
         print(f"DEBUG: Extracted dept: '{dept}'")
         
         # Extract skills
@@ -59,6 +63,8 @@ class ResumeParser:
         return CandidateProfile(
             name=name,
             location=location,
+            phone=phone,
+            email=email,
             dept=dept,
             seniority=seniority,
             skills=skills,
@@ -117,6 +123,60 @@ class ResumeParser:
                 if '(' in address:
                     address = address.split('(')[0].strip()
                 return address
+        
+        return ""
+    
+    def _extract_phone(self, text: str) -> str:
+        """Extract phone number from resume text."""
+        # Simple approach: find the line that starts with "Phone"
+        lines = text.split('\n')
+        for line in lines:
+            line = line.strip()
+            if line.lower().startswith('phone'):
+                # Extract everything after "Phone number:" or "Phone:"
+                if 'phone number:' in line.lower():
+                    # Use case-insensitive split
+                    parts = re.split(r'phone number:', line, flags=re.IGNORECASE, maxsplit=1)
+                    if len(parts) > 1:
+                        phone = parts[1].strip()
+                    else:
+                        continue
+                elif 'phone:' in line.lower():
+                    # Use case-insensitive split
+                    parts = re.split(r'phone:', line, flags=re.IGNORECASE, maxsplit=1)
+                    if len(parts) > 1:
+                        phone = parts[1].strip()
+                    else:
+                        continue
+                else:
+                    continue
+                
+                # Remove any trailing parentheses like "(Work)"
+                if '(' in phone and ')' in phone:
+                    # Find the last complete parentheses pair
+                    last_open = phone.rfind('(')
+                    last_close = phone.rfind(')')
+                    if last_open < last_close:
+                        # Remove the last parentheses group
+                        phone = phone[:last_open].strip()
+                
+                return phone
+        
+        return ""
+    
+    def _extract_email(self, text: str) -> str:
+        """Extract email address from resume text."""
+        # Look for email patterns
+        email_patterns = [
+            r'Email\s*(?:address)?:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})',
+            r'([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'  # General email pattern
+        ]
+        
+        for pattern in email_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            if matches:
+                email = matches[0].strip()
+                return email
         
         return ""
     

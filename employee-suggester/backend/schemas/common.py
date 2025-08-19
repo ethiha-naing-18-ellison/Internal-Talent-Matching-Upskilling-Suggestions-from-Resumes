@@ -16,6 +16,8 @@ class Role(BaseModel):
 class CandidateProfile(BaseModel):
     candidate_id: Optional[str] = None
     name: Optional[str] = None       # avoid storing full legal name elsewhere
+    phone: Optional[str] = None      # phone number
+    email: Optional[str] = None      # email address
     dept: Optional[str] = None
     location: Optional[str] = None
     seniority: Optional[str] = None
