@@ -60,6 +60,12 @@ class ResumeParser:
         # Extract certifications
         certs = self._extract_certifications(text)
         
+        # Extract projects
+        projects = self._extract_projects(text)
+        
+        # Extract rewards/awards
+        rewards = self._extract_rewards(text)
+        
         return CandidateProfile(
             name=name,
             location=location,
@@ -70,7 +76,9 @@ class ResumeParser:
             skills=skills,
             roles=roles,
             education=education,
-            certs=certs
+            certs=certs,
+            projects=projects,
+            rewards=rewards
         )
     
     def parse_from_upload(self, file_bytes: bytes, filename: str) -> CandidateProfile:
@@ -301,6 +309,11 @@ class ResumeParser:
                 in_education_section = True
                 continue
             
+            # Check if we're entering other sections (reset education section flag)
+            if re.search(r'(?i)^projects?$|^portfolio$|^personal projects$|^awards?$|^recognition$|^achievements?$|^honors?$|^certifications?$|^certs?$|^experience$|^work$|^employment$', line):
+                in_education_section = False
+                continue
+            
             # If we're in education section, look for degree patterns
             if in_education_section:
                 # Look for degree patterns
@@ -334,18 +347,156 @@ class ResumeParser:
         """Extract certifications from resume text."""
         certs = []
         
-        # Look for certification patterns
-        cert_patterns = [
-            r'(?i)(certification|certified|cert)',
-            r'(?i)(aws|azure|gcp|kubernetes|docker)',
-            r'(?i)(pmp|scrum|agile)'
-        ]
-        
+        # Look for certification section
         lines = text.split('\n')
+        in_cert_section = False
+        
         for line in lines:
             line = line.strip()
-            if any(pattern in line.lower() for pattern in cert_patterns):
-                if line and len(line) > 5:  # Avoid very short lines
-                    certs.append(line)
+            if not line:
+                continue
+            
+            # Check if we're entering a certification section
+            if re.search(r'(?i)^certifications?$|^certs?$|^certificates?$', line):
+                in_cert_section = True
+                continue
+            
+            # Check if we're entering other sections (reset cert section flag)
+            if re.search(r'(?i)^education$|^academic$|^qualifications$|^projects?$|^portfolio$|^personal projects$|^awards?$|^recognition$|^achievements?$|^honors?$|^experience$|^work$|^employment$', line):
+                in_cert_section = False
+                continue
+            
+            # If we're in cert section, look for certification patterns
+            if in_cert_section:
+                # Look for certification patterns
+                cert_patterns = [
+                    r'(?i)(certification|certified|cert)',
+                    r'(?i)(aws|azure|gcp|kubernetes|docker)',
+                    r'(?i)(pmp|scrum|agile)',
+                    r'(?i)(professional|associate|foundational)'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in cert_patterns):
+                    if line and len(line) > 5 and line not in certs:  # Avoid duplicates and short lines
+                        certs.append(line)
+                        continue
+            
+            # Also look for certification patterns anywhere in the text (but only if not in cert section)
+            if not in_cert_section:
+                cert_patterns = [
+                    r'(?i)(certification|certified|cert)\s*[-–]\s*',
+                    r'(?i)(aws|azure|gcp)\s+certified',
+                    r'(?i)(pmp|scrum|agile)\s+certification'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in cert_patterns):
+                    if line and len(line) > 5 and line not in certs:  # Avoid duplicates and short lines
+                        certs.append(line)
         
         return certs[:5]  # Limit to 5 certifications
+    
+    def _extract_projects(self, text: str) -> List[str]:
+        """Extract projects from resume text."""
+        projects = []
+        
+        # Look for project section
+        lines = text.split('\n')
+        in_project_section = False
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Check if we're entering a project section
+            if re.search(r'(?i)^projects?$|^portfolio$|^personal projects$', line):
+                in_project_section = True
+                continue
+            
+            # Check if we're entering other sections (reset project section flag)
+            if re.search(r'(?i)^education$|^academic$|^qualifications$|^awards?$|^recognition$|^achievements?$|^honors?$|^certifications?$|^certs?$|^experience$|^work$|^employment$', line):
+                in_project_section = False
+                continue
+            
+            # If we're in project section, look for project patterns
+            if in_project_section:
+                # Look for project patterns
+                project_patterns = [
+                    r'(?i)(web app|mobile app|dashboard|api|system|platform)',
+                    r'(?i)(analysis|automation|optimization|integration)',
+                    r'(?i)(machine learning|ai|data science|analytics)',
+                    r'(?i)(e-commerce|social media|blog|portfolio)'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in project_patterns):
+                    if line and len(line) > 5 and line not in projects:  # Avoid duplicates and short lines
+                        projects.append(line)
+                        continue
+            
+            # Also look for project patterns anywhere in the text (but only if not in project section)
+            if not in_project_section:
+                project_patterns = [
+                    r'(?i)(developed|built|created|designed)\s+',
+                    r'(?i)(implemented|launched|deployed)\s+',
+                    r'(?i)(project|application|system)\s*[-–]\s*',
+                    r'(?i)(using|with|technologies?)\s*[:]\s*'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in project_patterns):
+                    if line and len(line) > 5 and line not in projects:  # Avoid duplicates and short lines
+                        projects.append(line)
+        
+        return projects[:5]  # Limit to 5 projects
+    
+    def _extract_rewards(self, text: str) -> List[str]:
+        """Extract awards and recognition from resume text."""
+        rewards = []
+        
+        # Look for awards section
+        lines = text.split('\n')
+        in_awards_section = False
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Check if we're entering an awards section
+            if re.search(r'(?i)^awards?$|^recognition$|^achievements?$|^honors?$', line):
+                in_awards_section = True
+                continue
+            
+            # Check if we're entering other sections (reset awards section flag)
+            if re.search(r'(?i)^education$|^academic$|^qualifications$|^projects?$|^portfolio$|^personal projects$|^certifications?$|^certs?$|^experience$|^work$|^employment$', line):
+                in_awards_section = False
+                continue
+            
+            # If we're in awards section, look for award patterns
+            if in_awards_section:
+                # Look for award patterns
+                award_patterns = [
+                    r'(?i)(award|prize|recognition|honor|achievement)',
+                    r'(?i)(best|excellent|outstanding|top|first)',
+                    r'(?i)(scholarship|grant|fellowship)',
+                    r'(?i)(competition|hackathon|contest)'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in award_patterns):
+                    if line and len(line) > 5 and line not in rewards:  # Avoid duplicates and short lines
+                        rewards.append(line)
+                        continue
+            
+            # Also look for award patterns anywhere in the text (but only if not in awards section)
+            if not in_awards_section:
+                award_patterns = [
+                    r'(?i)(received|won|earned|achieved)\s+',
+                    r'(?i)(awarded|recognized|honored)\s+',
+                    r'(?i)(award|prize|recognition)\s*[-–]\s*',
+                    r'(?i)(best|excellent|outstanding)\s+'
+                ]
+                
+                if any(re.search(pattern, line) for pattern in award_patterns):
+                    if line and len(line) > 5 and line not in rewards:  # Avoid duplicates and short lines
+                        rewards.append(line)
+        
+        return rewards[:5]  # Limit to 5 awards

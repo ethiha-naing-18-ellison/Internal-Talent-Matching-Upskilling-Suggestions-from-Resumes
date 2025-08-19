@@ -25,6 +25,8 @@ class CandidateProfile(BaseModel):
     roles: List[Role] = []
     certs: List[str] = []
     education: List[str] = []
+    projects: List[str] = []
+    rewards: List[str] = []
 
 class JobSkillReq(BaseModel):
     skill: str
