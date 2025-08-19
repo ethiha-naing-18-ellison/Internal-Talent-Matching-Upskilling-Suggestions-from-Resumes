@@ -1050,6 +1050,21 @@
                 <!-- Matches Tab -->
                 <div id="matches-tab" class="tab-content" style="display: none;">
                     <div id="matches-content"></div>
+                    <!-- Job Matching Table moved here from Profile -->
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-briefcase"></i> Role</th>
+                                    <th><i class="fas fa-star"></i> Match Score</th>
+                                    <th><i class="fas fa-check-circle"></i> Your Skills</th>
+                                    <th><i class="fas fa-exclamation-circle"></i> Skills to Learn</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-body">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 
                 <!-- Upskilling Tab -->
@@ -1058,22 +1073,9 @@
                 </div>
             </div>
             
-            <!-- Basic Results Table -->
-            <div id="basic-results">
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-briefcase"></i> Role</th>
-                                <th><i class="fas fa-star"></i> Match Score</th>
-                                <th><i class="fas fa-check-circle"></i> Your Skills</th>
-                                <th><i class="fas fa-exclamation-circle"></i> Skills to Learn</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-body">
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Basic Results Table - Removed, now in Job Matches tab -->
+            <div id="basic-results" style="display: none;">
+                <!-- Job matching table moved to Job Matches tab -->
             </div>
         </div>
 
@@ -1374,18 +1376,33 @@
 
         // Enhanced analysis with structured parsing and upskilling
         async function performEnhancedAnalysis(text) {
-            // Step 1: Parse resume
-            const profile = await parseResumeText(text);
-            
-            // Step 2: Get job matches
-            const matches = await getJobMatches(profile);
-            
-            // Step 3: Generate upskilling plans
-            const upskillPlans = await generateUpskillingPlans(matches);
-            
-            // Display enhanced results
-            displayEnhancedResults(profile, matches, upskillPlans);
-            showNotification(`Enhanced analysis complete! Found ${matches.matches?.length || 0} matches with upskilling plans.`);
+            try {
+                // Step 1: Parse resume (optional - for profile display)
+                const profile = await parseResumeText(text);
+                
+                // Step 2: Display profile (enhanced matches will be populated from table data)
+                displayProfile(profile.profile);
+                
+                // Step 3: Display enhanced matches (will use data from basic results table)
+                displayMatches([]);
+                
+                // Step 4: Generate upskilling plans (optional)
+                try {
+                    const upskillPlans = await generateUpskillingPlans({ matches: [] });
+                    displayUpskillingPlans(upskillPlans.plan);
+                } catch (error) {
+                    console.warn('Upskilling analysis not available:', error);
+                    displayUpskillingPlans([]);
+                }
+                
+                showNotification(`Enhanced analysis complete! Check the Job Matches tab for detailed results.`);
+            } catch (error) {
+                console.warn('Enhanced analysis failed, using basic results:', error);
+                // Fallback to basic display
+                displayProfile(null);
+                displayMatches([]);
+                displayUpskillingPlans([]);
+            }
         }
 
         // Basic analysis (original functionality)
@@ -1465,16 +1482,9 @@
             return await response.json();
         }
 
-        // Display enhanced results
+        // Display enhanced results - No longer needed, handled in performEnhancedAnalysis
         function displayEnhancedResults(profile, matches, upskillPlans) {
-            // Display profile
-            displayProfile(profile.profile);
-            
-            // Display matches
-            displayMatches(matches.matches);
-            
-            // Display upskilling plans
-            displayUpskillingPlans(upskillPlans.plan);
+            // This function is deprecated - display is now handled directly in performEnhancedAnalysis
         }
 
         // Display profile information
@@ -1483,7 +1493,7 @@
                 document.getElementById('profile-content').innerHTML = `
                     <div class="card">
                         <h3 style="color: var(--text-dark);">Profile Analysis</h3>
-                        <p>Enhanced profile analysis is not available. Please use the basic results table above.</p>
+                        <p>Enhanced profile analysis is not available. Please check the Job Matches tab for role suggestions.</p>
                     </div>
                 `;
                 return;
@@ -1581,29 +1591,62 @@
             document.getElementById('profile-content').innerHTML = content;
         }
 
-        // Display enhanced matches
+        // Display enhanced matches - Updated to use basic results data
         function displayMatches(matches) {
-            if (!matches || matches.length === 0) {
+            // Get the basic results data from the table
+            const resultsBody = document.getElementById('results-body');
+            const rows = resultsBody.querySelectorAll('tr');
+            
+            if (!rows || rows.length === 0) {
                 document.getElementById('matches-content').innerHTML = `
                     <div class="card">
-                        <h3 style="color: var(--text-dark);">No Enhanced Matches</h3>
-                        <p>Enhanced matching analysis is not available. Please use the basic results table above.</p>
+                        <h3 style="color: var(--text-dark);">No Job Matches</h3>
+                        <p>No job matches found. Please check the table below for results.</p>
                     </div>
                 `;
                 return;
             }
 
-            const content = matches.map(match => {
+            // Convert table data to enhanced display format
+            const enhancedMatches = Array.from(rows).map(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 4) return null;
+                
+                const roleCell = cells[0];
+                const scoreCell = cells[1];
+                const matchedSkillsCell = cells[2];
+                const missingSkillsCell = cells[3];
+                
+                const roleTitle = roleCell.querySelector('.role-title')?.textContent || 'Unknown Role';
+                const roleId = roleCell.querySelector('.role-id')?.textContent || '';
+                const scoreText = scoreCell.querySelector('.score')?.textContent || '0%';
+                const score = parseFloat(scoreText.replace('%', '')) / 100;
+                
+                const matchedSkills = Array.from(matchedSkillsCell.querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                const missingSkills = Array.from(missingSkillsCell.querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                
+                return {
+                    job_id: roleId,
+                    title: roleTitle,
+                    score: score,
+                    matched_skills: matchedSkills,
+                    missing_skills: missingSkills
+                };
+            }).filter(match => match !== null);
+
+            const content = enhancedMatches.map(match => {
                 const scoreClass = match.score >= 0.8 ? 'score-excellent' : 
-                                 match.score >= 0.6 ? 'score-good' : 'score-fair';
+                                 match.score >= 0.6 ? 'score-good' : 
+                                 match.score >= 0.4 ? 'score-fair' : 'score-poor';
                 
                 const scoreIcon = match.score >= 0.8 ? 'fas fa-star' : 
-                                match.score >= 0.6 ? 'fas fa-thumbs-up' : 'fas fa-minus';
+                                match.score >= 0.6 ? 'fas fa-thumbs-up' : 
+                                match.score >= 0.4 ? 'fas fa-meh' : 'fas fa-thumbs-down';
 
                 return `
                     <div class="card" style="margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                            <h3 style="color: var(--text-dark);">${match.job_id || 'Unknown Job'}</h3>
+                            <h3 style="color: var(--text-dark);">${match.title}</h3>
                             <div class="score ${scoreClass}">
                                 <i class="${scoreIcon}"></i>
                                 ${(match.score * 100).toFixed(1)}%
@@ -1613,24 +1656,42 @@
                         <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
                             <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Why this match?</h4>
                             <ul style="list-style: none; padding: 0;">
-                                ${(match.reasons || []).map(reason => `
+                                ${match.matched_skills.length > 0 ? `
+                                    <li style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
+                                        <div style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div style="flex: 1;">Strong skill match: ${match.matched_skills.length} skills aligned</div>
+                                        <div style="font-size: 0.75rem; color: var(--muted);">${Math.round(match.score * 100)}%</div>
+                                    </li>
+                                ` : ''}
+                                ${match.matched_skills.slice(0, 3).map(skill => `
                                     <li style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
                                         <div style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
-                                            <i class="fas fa-info"></i>
+                                            <i class="fas fa-star"></i>
                                         </div>
-                                        <div style="flex: 1;">${reason.note || 'Match reason'}</div>
-                                        <div style="font-size: 0.75rem; color: var(--muted);">${(reason.weight * 100).toFixed(0)}%</div>
+                                        <div style="flex: 1;">Key skill: ${skill}</div>
+                                        <div style="font-size: 0.75rem; color: var(--muted);">${Math.round((match.score * 100) / match.matched_skills.length)}%</div>
                                     </li>
                                 `).join('')}
                             </ul>
                         </div>
+                        
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Your Matched Skills</h4>
+                            <div class="skills">
+                                ${match.matched_skills.map(skill => `
+                                    <span class="skill-tag skill-matched">${skill}</span>
+                                `).join('')}
+                            </div>
+                        </div>
 
-                        ${(match.gaps || []).length > 0 ? `
+                        ${match.missing_skills.length > 0 ? `
                             <div style="margin-top: 1rem;">
-                                <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Skill Gaps</h4>
+                                <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Skills to Learn</h4>
                                 <div class="skills">
-                                    ${match.gaps.map(gap => `
-                                        <span class="skill-tag skill-missing">${gap}</span>
+                                    ${match.missing_skills.map(skill => `
+                                        <span class="skill-tag skill-missing">${skill}</span>
                                     `).join('')}
                                 </div>
                             </div>
@@ -1648,7 +1709,7 @@
                 document.getElementById('upskill-content').innerHTML = `
                     <div class="card">
                         <h3 style="color: var(--text-dark);">Upskilling Recommendations</h3>
-                        <p>Enhanced upskilling analysis is not available. Please use the basic results table above to see skill gaps.</p>
+                        <p>Enhanced upskilling analysis is not available. Please check the Job Matches tab to see skill gaps.</p>
                     </div>
                 `;
                 return;
@@ -1736,9 +1797,9 @@
                 return;
             }
 
-            // Show both basic results and enhanced tabs
+            // Show enhanced tabs only (basic results table is now in Job Matches tab)
             document.getElementById('enhanced-tabs').style.display = 'block';
-            document.getElementById('basic-results').style.display = 'block';
+            document.getElementById('basic-results').style.display = 'none';
             
             emptyState.style.display = 'none';
             resultsSection.style.display = 'block';
