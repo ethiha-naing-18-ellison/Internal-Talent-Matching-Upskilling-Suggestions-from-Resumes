@@ -1,0 +1,514 @@
+{
+  "skills": {
+    "python": {
+      "type": "Programming Language",
+      "difficulty": "Intermediate",
+      "timeToLearn": "4-6 weeks",
+      "jobCategories": ["Data Scientist", "Data Engineer", "Software Engineer", "Machine Learning Engineer", "DevOps Engineer", "Full Stack Developer"],
+      "resources": [
+        {
+          "name": "Python for Data Science",
+          "type": "Course",
+          "platform": "Coursera",
+          "hours": 40,
+          "description": "Comprehensive course covering Python fundamentals, data manipulation with pandas, visualization with matplotlib, and basic machine learning concepts. Perfect for beginners transitioning to data science.",
+          "url": "https://coursera.org"
+        },
+        {
+          "name": "Python Crash Course",
+          "type": "Book",
+          "platform": "No Starch Press",
+          "hours": 60,
+          "description": "Hands-on book with practical projects covering web development, data visualization, and game development. Includes exercises and real-world applications.",
+          "url": "https://nostarch.com"
+        },
+        {
+          "name": "Real Python Tutorials",
+          "type": "Tutorial",
+          "platform": "Real Python",
+          "hours": 20,
+          "description": "Free, high-quality tutorials covering Python basics, web development, data science, and advanced topics. Great for self-paced learning.",
+          "url": "https://realpython.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Web Scraper with BeautifulSoup",
+          "description": "Build a web scraper that extracts data from websites, handles different HTML structures, and saves data to CSV/JSON files. Learn about HTTP requests, HTML parsing, and data cleaning.",
+          "difficulty": "Beginner",
+          "hours": 8
+        },
+        {
+          "title": "Data Analysis Dashboard with Streamlit",
+          "description": "Create an interactive web application for data visualization and analysis. Include charts, filters, and real-time data updates. Perfect for showcasing data science skills.",
+          "difficulty": "Intermediate",
+          "hours": 12
+        },
+        {
+          "title": "REST API with FastAPI",
+          "description": "Develop a modern, fast web API with automatic documentation, data validation, and async support. Include CRUD operations, authentication, and database integration.",
+          "difficulty": "Intermediate",
+          "hours": 16
+        }
+      ]
+    },
+    "sql": {
+      "type": "Database Language",
+      "difficulty": "Beginner",
+      "timeToLearn": "2-3 weeks",
+      "jobCategories": ["Data Scientist", "Data Engineer", "Software Engineer", "Business Analyst", "Database Administrator"],
+      "resources": [
+        {
+          "name": "SQL for Data Science",
+          "type": "Course",
+          "platform": "DataCamp",
+          "hours": 25,
+          "description": "Interactive course focusing on SQL queries for data analysis, including joins, aggregations, window functions, and optimization techniques. Includes hands-on exercises with real datasets.",
+          "url": "https://datacamp.com"
+        },
+        {
+          "name": "SQL Tutorial",
+          "type": "Tutorial",
+          "platform": "W3Schools",
+          "hours": 15,
+          "description": "Free comprehensive tutorial covering SQL basics, advanced queries, database design, and best practices. Includes interactive examples and exercises.",
+          "url": "https://w3schools.com"
+        },
+        {
+          "name": "LeetCode SQL Problems",
+          "type": "Practice",
+          "platform": "LeetCode",
+          "hours": 30,
+          "description": "Practice solving real-world SQL problems with varying difficulty levels. Great for improving query optimization and problem-solving skills.",
+          "url": "https://leetcode.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "E-commerce Database Design",
+          "description": "Design a complete database schema for an online store including products, customers, orders, and inventory. Implement complex queries for sales analytics, customer segmentation, and inventory management.",
+          "difficulty": "Intermediate",
+          "hours": 20
+        },
+        {
+          "title": "Business Analytics Dashboard",
+          "description": "Create comprehensive SQL queries for business intelligence including sales trends, customer behavior analysis, and performance metrics. Focus on optimization and data visualization integration.",
+          "difficulty": "Advanced",
+          "hours": 16
+        },
+        {
+          "title": "Data Pipeline with SQL and Python",
+          "description": "Build an ETL pipeline that extracts data from multiple sources, transforms it using SQL, and loads it into a data warehouse. Include data quality checks and monitoring.",
+          "difficulty": "Advanced",
+          "hours": 24
+        }
+      ]
+    },
+    "machine learning": {
+      "type": "AI/ML",
+      "difficulty": "Advanced",
+      "timeToLearn": "8-12 weeks",
+      "jobCategories": ["Data Scientist", "Machine Learning Engineer", "AI Engineer", "Research Scientist"],
+      "resources": [
+        {
+          "name": "Machine Learning Course",
+          "type": "Course",
+          "platform": "Stanford Online",
+          "hours": 80,
+          "description": "Comprehensive course covering supervised and unsupervised learning, neural networks, and practical applications. Includes mathematical foundations and hands-on projects with real-world datasets.",
+          "url": "https://stanford.edu"
+        },
+        {
+          "name": "Hands-On Machine Learning",
+          "type": "Book",
+          "platform": "O'Reilly",
+          "hours": 100,
+          "description": "Practical guide to machine learning with scikit-learn, TensorFlow, and Keras. Covers end-to-end ML projects from data preprocessing to model deployment.",
+          "url": "https://oreilly.com"
+        },
+        {
+          "name": "Kaggle Courses",
+          "type": "Course",
+          "platform": "Kaggle",
+          "hours": 50,
+          "description": "Free courses on Python, machine learning, and deep learning. Includes hands-on exercises and access to real datasets for practice.",
+          "url": "https://kaggle.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Customer Churn Prediction Model",
+          "description": "Develop a machine learning model to predict customer churn using historical data. Include feature engineering, model selection, hyperparameter tuning, and deployment considerations. Focus on business impact and interpretability.",
+          "difficulty": "Intermediate",
+          "hours": 32
+        },
+        {
+          "title": "Image Classification System",
+          "description": "Build a deep learning model for image classification using CNN architectures. Include data augmentation, transfer learning, and model optimization. Deploy the model as a web service with real-time predictions.",
+          "difficulty": "Advanced",
+          "hours": 40
+        },
+        {
+          "title": "Recommendation Engine",
+          "description": "Create a recommendation system using collaborative filtering and content-based approaches. Implement both user-based and item-based recommendations with evaluation metrics and A/B testing framework.",
+          "difficulty": "Advanced",
+          "hours": 36
+        }
+      ]
+    },
+    "react": {
+      "type": "Frontend Framework",
+      "difficulty": "Intermediate",
+      "timeToLearn": "6-8 weeks",
+      "jobCategories": ["Frontend Developer", "Full Stack Developer", "UI/UX Developer", "Software Engineer"],
+      "resources": [
+        {
+          "name": "React Tutorial",
+          "type": "Course",
+          "platform": "React Official",
+          "hours": 35,
+          "description": "Official React documentation and tutorials covering hooks, components, state management, and modern React patterns. Includes interactive examples and best practices.",
+          "url": "https://react.dev"
+        },
+        {
+          "name": "Full Stack Open",
+          "type": "Course",
+          "platform": "University of Helsinki",
+          "hours": 120,
+          "description": "Comprehensive full-stack development course covering React, Node.js, databases, and deployment. Includes modern JavaScript, testing, and CI/CD practices.",
+          "url": "https://fullstackopen.com"
+        },
+        {
+          "name": "React Projects on YouTube",
+          "type": "Tutorial",
+          "platform": "YouTube",
+          "hours": 25,
+          "description": "Free video tutorials covering React fundamentals, advanced concepts, and real-world project building. Great for visual learners and hands-on practice.",
+          "url": "https://youtube.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Task Management Application",
+          "description": "Build a full-featured task management app with React hooks, local storage, drag-and-drop functionality, and responsive design. Include user authentication, task categories, and progress tracking.",
+          "difficulty": "Intermediate",
+          "hours": 24
+        },
+        {
+          "title": "Portfolio Website",
+          "description": "Create a modern, responsive portfolio website using React with smooth animations, contact forms, and project showcases. Include SEO optimization and performance best practices.",
+          "difficulty": "Beginner",
+          "hours": 16
+        },
+        {
+          "title": "Real-time Chat Application",
+          "description": "Develop a real-time chat app using React, WebSocket connections, and a backend API. Include user authentication, message history, file sharing, and online status indicators.",
+          "difficulty": "Advanced",
+          "hours": 32
+        }
+      ]
+    },
+    "docker": {
+      "type": "DevOps",
+      "difficulty": "Intermediate",
+      "timeToLearn": "3-4 weeks",
+      "jobCategories": ["DevOps Engineer", "Site Reliability Engineer", "Cloud Engineer", "Software Engineer"],
+      "resources": [
+        {
+          "name": "Docker for Beginners",
+          "type": "Course",
+          "platform": "Docker Official",
+          "hours": 20,
+          "description": "Official Docker tutorial covering container basics, Dockerfile creation, image management, and container orchestration. Includes hands-on labs and real-world examples.",
+          "url": "https://docker.com"
+        },
+        {
+          "name": "Docker Deep Dive",
+          "type": "Book",
+          "platform": "Packt",
+          "hours": 40,
+          "description": "Comprehensive guide to Docker internals, advanced networking, security best practices, and production deployment strategies. Covers Docker Compose and Swarm.",
+          "url": "https://packt.com"
+        },
+        {
+          "name": "Docker Tutorial on YouTube",
+          "type": "Tutorial",
+          "platform": "YouTube",
+          "hours": 15,
+          "description": "Free video tutorials covering Docker fundamentals, practical examples, and common use cases. Great for visual learners and quick reference.",
+          "url": "https://youtube.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Web Application Containerization",
+          "description": "Containerize a full-stack web application with separate containers for frontend, backend, and database. Include Docker Compose for local development and production deployment considerations.",
+          "difficulty": "Intermediate",
+          "hours": 16
+        },
+        {
+          "title": "Microservices Architecture",
+          "description": "Design and implement a microservices architecture using Docker containers. Include service discovery, load balancing, and monitoring. Deploy using Docker Swarm or Kubernetes.",
+          "difficulty": "Advanced",
+          "hours": 32
+        },
+        {
+          "title": "CI/CD Pipeline with Docker",
+          "description": "Build a complete CI/CD pipeline using Docker, GitHub Actions, and cloud deployment. Include automated testing, security scanning, and blue-green deployment strategies.",
+          "difficulty": "Advanced",
+          "hours": 24
+        }
+      ]
+    },
+    "aws": {
+      "type": "Cloud Platform",
+      "difficulty": "Intermediate",
+      "timeToLearn": "6-8 weeks",
+      "jobCategories": ["Cloud Engineer", "DevOps Engineer", "Site Reliability Engineer", "Solutions Architect"],
+      "resources": [
+        {
+          "name": "AWS Cloud Practitioner",
+          "type": "Certification",
+          "platform": "AWS",
+          "hours": 60,
+          "description": "Foundation-level AWS certification covering cloud concepts, security, architecture, pricing, and support. Includes hands-on labs and practice exams for comprehensive preparation.",
+          "url": "https://aws.amazon.com"
+        },
+        {
+          "name": "AWS Solutions Architect",
+          "type": "Course",
+          "platform": "A Cloud Guru",
+          "hours": 80,
+          "description": "Comprehensive course preparing for AWS Solutions Architect certification. Covers advanced AWS services, architecture patterns, and real-world deployment scenarios.",
+          "url": "https://acloudguru.com"
+        },
+        {
+          "name": "AWS Tutorials",
+          "type": "Tutorial",
+          "platform": "AWS Official",
+          "hours": 30,
+          "description": "Free official AWS tutorials covering core services, best practices, and hands-on projects. Includes step-by-step guides and sample code.",
+          "url": "https://aws.amazon.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Web Application Deployment on AWS",
+          "description": "Deploy a full-stack web application using AWS services including EC2, RDS, S3, and CloudFront. Implement auto-scaling, load balancing, and monitoring with CloudWatch.",
+          "difficulty": "Intermediate",
+          "hours": 24
+        },
+        {
+          "title": "Serverless Architecture",
+          "description": "Build a serverless application using AWS Lambda, API Gateway, DynamoDB, and S3. Include event-driven architecture, authentication, and cost optimization strategies.",
+          "difficulty": "Advanced",
+          "hours": 32
+        },
+        {
+          "title": "Data Pipeline with AWS Services",
+          "description": "Create a data processing pipeline using AWS Glue, S3, Redshift, and QuickSight. Include ETL processes, data warehousing, and business intelligence dashboards.",
+          "difficulty": "Advanced",
+          "hours": 40
+        }
+      ]
+    },
+    "data analysis": {
+      "type": "Analytics",
+      "difficulty": "Intermediate",
+      "timeToLearn": "4-6 weeks",
+      "jobCategories": ["Data Analyst", "Business Analyst", "Data Scientist", "Business Intelligence Analyst"],
+      "resources": [
+        {
+          "name": "Data Analysis with Python",
+          "type": "Course",
+          "platform": "Coursera",
+          "hours": 45,
+          "description": "Comprehensive course covering pandas, numpy, matplotlib, and seaborn for data manipulation and visualization. Includes statistical analysis and real-world case studies.",
+          "url": "https://coursera.org"
+        },
+        {
+          "name": "Python for Data Analysis",
+          "type": "Book",
+          "platform": "O'Reilly",
+          "hours": 70,
+          "description": "In-depth guide to data analysis using Python libraries. Covers data cleaning, transformation, aggregation, and visualization with practical examples.",
+          "url": "https://oreilly.com"
+        },
+        {
+          "name": "DataCamp Data Analysis",
+          "type": "Course",
+          "platform": "DataCamp",
+          "hours": 35,
+          "description": "Interactive course focusing on data analysis workflows, statistical concepts, and visualization techniques. Includes hands-on projects with real datasets.",
+          "url": "https://datacamp.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Real-world Dataset Analysis",
+          "description": "Conduct comprehensive analysis of a real-world dataset (e.g., sales data, customer behavior, or financial data). Include data cleaning, exploratory analysis, statistical testing, and actionable insights.",
+          "difficulty": "Intermediate",
+          "hours": 20
+        },
+        {
+          "title": "Interactive Data Visualizations",
+          "description": "Create interactive dashboards using tools like Plotly, Dash, or Tableau. Include multiple chart types, filters, and drill-down capabilities for comprehensive data exploration.",
+          "difficulty": "Intermediate",
+          "hours": 16
+        },
+        {
+          "title": "Business Intelligence Dashboard",
+          "description": "Build a complete BI dashboard with automated data pipelines, KPI tracking, and executive reporting. Include data refresh mechanisms, alerting, and mobile-responsive design.",
+          "difficulty": "Advanced",
+          "hours": 28
+        }
+      ]
+    },
+    "javascript": {
+      "type": "Programming Language",
+      "difficulty": "Intermediate",
+      "timeToLearn": "4-6 weeks",
+      "jobCategories": ["Frontend Developer", "Full Stack Developer", "Software Engineer", "Web Developer"],
+      "resources": [
+        {
+          "name": "JavaScript: The Complete Guide",
+          "type": "Course",
+          "platform": "Udemy",
+          "hours": 50,
+          "description": "Comprehensive JavaScript course covering ES6+, modern syntax, async programming, and real-world applications. Includes DOM manipulation and browser APIs.",
+          "url": "https://udemy.com"
+        },
+        {
+          "name": "Eloquent JavaScript",
+          "type": "Book",
+          "platform": "Free Online",
+          "hours": 40,
+          "description": "Free, in-depth JavaScript book covering fundamentals, advanced concepts, and practical programming. Great for understanding JavaScript deeply.",
+          "url": "https://eloquentjavascript.net"
+        },
+        {
+          "name": "JavaScript Tutorial",
+          "type": "Tutorial",
+          "platform": "MDN Web Docs",
+          "hours": 30,
+          "description": "Official Mozilla documentation with comprehensive JavaScript tutorials, examples, and best practices. Perfect for reference and learning.",
+          "url": "https://developer.mozilla.org"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Interactive Web Application",
+          "description": "Build a dynamic web application with JavaScript, including form validation, data manipulation, and interactive UI elements. Focus on modern ES6+ features and best practices.",
+          "difficulty": "Intermediate",
+          "hours": 20
+        },
+        {
+          "title": "Browser Game",
+          "description": "Create an engaging browser-based game using JavaScript, HTML5 Canvas, and modern web APIs. Include game logic, user interaction, and responsive design.",
+          "difficulty": "Advanced",
+          "hours": 32
+        },
+        {
+          "title": "API Integration Dashboard",
+          "description": "Develop a dashboard that integrates with external APIs, handles data visualization, and provides real-time updates. Use modern JavaScript frameworks and libraries.",
+          "difficulty": "Intermediate",
+          "hours": 24
+        }
+      ]
+    },
+    "node.js": {
+      "type": "Runtime Environment",
+      "difficulty": "Intermediate",
+      "timeToLearn": "3-4 weeks",
+      "jobCategories": ["Backend Developer", "Full Stack Developer", "Software Engineer", "DevOps Engineer"],
+      "resources": [
+        {
+          "name": "Node.js Complete Course",
+          "type": "Course",
+          "platform": "Udemy",
+          "hours": 45,
+          "description": "Complete Node.js course covering server-side development, Express.js framework, database integration, and deployment. Includes REST API development and authentication.",
+          "url": "https://udemy.com"
+        },
+        {
+          "name": "Node.js Documentation",
+          "type": "Tutorial",
+          "platform": "Node.js Official",
+          "hours": 25,
+          "description": "Official Node.js documentation with comprehensive guides, API references, and best practices. Essential for understanding Node.js internals.",
+          "url": "https://nodejs.org"
+        },
+        {
+          "name": "Express.js Tutorial",
+          "type": "Tutorial",
+          "platform": "Express.js Official",
+          "hours": 20,
+          "description": "Official Express.js documentation covering web application framework, middleware, routing, and advanced features for building robust APIs.",
+          "url": "https://expressjs.com"
+        }
+      ],
+      "projects": [
+        {
+          "title": "REST API Server",
+          "description": "Build a complete REST API using Node.js and Express.js with authentication, database integration, and comprehensive error handling. Include API documentation and testing.",
+          "difficulty": "Intermediate",
+          "hours": 28
+        },
+        {
+          "title": "Real-time Chat Application",
+          "description": "Develop a real-time chat application using Node.js, Socket.io, and a database. Include user authentication, message persistence, and real-time notifications.",
+          "difficulty": "Advanced",
+          "hours": 36
+        },
+        {
+          "title": "E-commerce Backend",
+          "description": "Create a complete e-commerce backend with product management, user authentication, payment processing, and order management. Use modern Node.js patterns and security best practices.",
+          "difficulty": "Advanced",
+          "hours": 40
+        }
+      ]
+    }
+  },
+  "jobCategories": {
+    "Data Scientist": {
+      "prioritySkills": ["python", "machine learning", "sql", "data analysis"],
+      "secondarySkills": ["statistics", "r", "spark", "aws"],
+      "description": "Focus on statistical analysis, machine learning, and data-driven insights"
+    },
+    "Data Engineer": {
+      "prioritySkills": ["python", "sql", "aws", "docker"],
+      "secondarySkills": ["spark", "kubernetes", "airflow", "kafka"],
+      "description": "Focus on data pipeline development, ETL processes, and infrastructure"
+    },
+    "Software Engineer": {
+      "prioritySkills": ["python", "javascript", "sql", "docker"],
+      "secondarySkills": ["java", "react", "aws", "kubernetes"],
+      "description": "Focus on full-stack development, system design, and software architecture"
+    },
+    "Frontend Developer": {
+      "prioritySkills": ["javascript", "react", "html", "css"],
+      "secondarySkills": ["typescript", "vue", "angular", "node.js"],
+      "description": "Focus on user interface development, responsive design, and user experience"
+    },
+    "DevOps Engineer": {
+      "prioritySkills": ["docker", "kubernetes", "aws", "python"],
+      "secondarySkills": ["jenkins", "terraform", "ansible", "prometheus"],
+      "description": "Focus on infrastructure automation, CI/CD pipelines, and system reliability"
+    },
+    "Machine Learning Engineer": {
+      "prioritySkills": ["python", "machine learning", "docker", "aws"],
+      "secondarySkills": ["kubernetes", "tensorflow", "pytorch", "mlflow"],
+      "description": "Focus on ML model development, deployment, and production systems"
+    },
+    "Business Analyst": {
+      "prioritySkills": ["sql", "data analysis", "excel", "python"],
+      "secondarySkills": ["tableau", "power bi", "statistics", "aws"],
+      "description": "Focus on business intelligence, reporting, and data-driven decision making"
+    },
+    "Cloud Engineer": {
+      "prioritySkills": ["aws", "docker", "kubernetes", "python"],
+      "secondarySkills": ["terraform", "jenkins", "prometheus", "linux"],
+      "description": "Focus on cloud infrastructure, automation, and platform management"
+    }
+  }
+}

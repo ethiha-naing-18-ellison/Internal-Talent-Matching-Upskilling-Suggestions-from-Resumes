@@ -1,8 +1,10 @@
 weights:
-  skills: 0.55
-  experience: 0.25
-  domain: 0.15
-  location: 0.05
+  skills: 0.40
+  projects: 0.25
+  education: 0.20
+  experience: 0.10
+  domain: 0.03
+  location: 0.02
 thresholds:
   min_match_score: 0.65
   hard_constraints: ["location"]  # enforce equality before scoring

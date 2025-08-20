@@ -4,9 +4,11 @@ from ..schemas.match import MatchResult, MatchReason
 from ..utils.embeddings import cosine_similarity, text_to_vec
 from ..utils.io import load_yaml, get_config_path
 import rapidfuzz
+import re
+import re
 
 class Matcher:
-    """Match candidates to jobs based on skills and constraints."""
+    """Match candidates to jobs based on skills, projects, education, and constraints."""
     
     def __init__(self):
         self.weights_config = self._load_weights_config()
@@ -44,6 +46,8 @@ class Matcher:
         
         # Calculate component scores
         skills_score, skills_reasons, skills_gaps = self._score_skills(candidate, job, weights_cfg)
+        projects_score, projects_reasons = self._score_projects(candidate, job, weights_cfg)
+        education_score, education_reasons = self._score_education(candidate, job, weights_cfg)
         experience_score, experience_reasons = self._score_experience(candidate, job, weights_cfg)
         domain_score, domain_reasons = self._score_domain(candidate, job, weights_cfg)
         location_score, location_reasons = self._score_location(candidate, job, weights_cfg)
@@ -51,14 +55,16 @@ class Matcher:
         # Weighted combination
         weights = weights_cfg.get('weights', {})
         final_score = (
-            skills_score * weights.get('skills', 0.55) +
-            experience_score * weights.get('experience', 0.25) +
-            domain_score * weights.get('domain', 0.15) +
-            location_score * weights.get('location', 0.05)
+            skills_score * weights.get('skills', 0.40) +
+            projects_score * weights.get('projects', 0.25) +
+            education_score * weights.get('education', 0.20) +
+            experience_score * weights.get('experience', 0.10) +
+            domain_score * weights.get('domain', 0.03) +
+            location_score * weights.get('location', 0.02)
         )
         
         # Combine all reasons
-        all_reasons = skills_reasons + experience_reasons + domain_reasons + location_reasons
+        all_reasons = skills_reasons + projects_reasons + education_reasons + experience_reasons + domain_reasons + location_reasons
         
         return {
             'score': round(final_score, 4),
@@ -122,6 +128,160 @@ class Matcher:
         
         return final_skills_score, reasons, gaps
     
+    def _score_projects(self, candidate: CandidateProfile, job: JobProfile, weights_cfg: Dict[str, Any]) -> tuple:
+        """Score project relevance to job requirements."""
+        reasons = []
+        
+        if not candidate.projects:
+            return 0.0, reasons
+        
+        # Extract key terms from job title and requirements
+        job_keywords = self._extract_job_keywords(job)
+        
+        relevant_projects = 0
+        total_projects = len(candidate.projects)
+        
+        for project in candidate.projects:
+            project_lower = project.lower()
+            
+            # Check for keyword matches
+            keyword_matches = 0
+            for keyword in job_keywords:
+                if keyword.lower() in project_lower:
+                    keyword_matches += 1
+            
+            # Consider project relevant if it has at least 2 keyword matches
+            if keyword_matches >= 2:
+                relevant_projects += 1
+                reasons.append(MatchReason(
+                    feature='projects',
+                    weight=1.0,
+                    note=f"Relevant project: {project[:50]}{'...' if len(project) > 50 else ''}"
+                ))
+            elif keyword_matches == 1:
+                relevant_projects += 0.5
+                reasons.append(MatchReason(
+                    feature='projects',
+                    weight=0.5,
+                    note=f"Partially relevant project: {project[:50]}{'...' if len(project) > 50 else ''}"
+                ))
+        
+        # Calculate project score
+        project_score = relevant_projects / total_projects if total_projects > 0 else 0.0
+        
+        # Add summary reason if there are relevant projects
+        if relevant_projects > 0:
+            reasons.insert(0, MatchReason(
+                feature='projects',
+                weight=project_score,
+                note=f"Found {relevant_projects} relevant projects out of {total_projects} total"
+            ))
+        
+        return project_score, reasons
+    
+    def _score_education(self, candidate: CandidateProfile, job: JobProfile, weights_cfg: Dict[str, Any]) -> tuple:
+        """Score education relevance to job requirements."""
+        reasons = []
+        
+        if not candidate.education:
+            return 0.0, reasons
+        
+        # Extract education keywords that are relevant to the job
+        job_keywords = self._extract_job_keywords(job)
+        education_keywords = self._get_education_keywords()
+        
+        relevant_education = 0
+        total_education = len(candidate.education)
+        
+        for edu in candidate.education:
+            edu_lower = edu.lower()
+            
+            # Check for degree level relevance
+            degree_score = self._score_degree_level(edu_lower, job.title.lower())
+            
+            # Check for field relevance
+            field_score = 0.0
+            for keyword in job_keywords:
+                if keyword.lower() in edu_lower:
+                    field_score += 0.3
+            
+            # Check for education-specific keywords
+            for edu_keyword in education_keywords:
+                if edu_keyword.lower() in edu_lower:
+                    field_score += 0.2
+            
+            # Calculate overall education item score
+            item_score = min(1.0, degree_score + field_score)
+            relevant_education += item_score
+            
+            if item_score > 0.5:
+                reasons.append(MatchReason(
+                    feature='education',
+                    weight=item_score,
+                    note=f"Relevant education: {edu[:50]}{'...' if len(edu) > 50 else ''}"
+                ))
+        
+        # Calculate education score
+        education_score = relevant_education / total_education if total_education > 0 else 0.0
+        
+        # Add summary reason if there's relevant education
+        if relevant_education > 0:
+            reasons.insert(0, MatchReason(
+                feature='education',
+                weight=education_score,
+                note=f"Education relevance score: {relevant_education:.1f} out of {total_education} items"
+            ))
+        
+        return education_score, reasons
+    
+    def _extract_job_keywords(self, job: JobProfile) -> List[str]:
+        """Extract relevant keywords from job title and requirements."""
+        keywords = []
+        
+        # Extract from job title
+        title_words = re.findall(r'\b\w+\b', job.title.lower())
+        keywords.extend([word for word in title_words if len(word) > 3])
+        
+        # Extract from required skills
+        for req in job.required:
+            keywords.append(req.skill.lower())
+        
+        # Extract from nice-to-have skills
+        for skill in job.nice:
+            keywords.append(skill.lower())
+        
+        # Add common job-related terms
+        common_terms = ['data', 'software', 'web', 'mobile', 'cloud', 'database', 'api', 'frontend', 'backend', 'fullstack']
+        keywords.extend(common_terms)
+        
+        return list(set(keywords))  # Remove duplicates
+    
+    def _get_education_keywords(self) -> List[str]:
+        """Get education-related keywords for matching."""
+        return [
+            'computer science', 'software engineering', 'information technology', 'data science',
+            'computer engineering', 'electrical engineering', 'mathematics', 'statistics',
+            'business', 'management', 'economics', 'finance', 'marketing',
+            'bachelor', 'master', 'phd', 'degree', 'certification', 'diploma'
+        ]
+    
+    def _score_degree_level(self, education_text: str, job_title: str) -> float:
+        """Score education level relevance to job seniority."""
+        # Higher degrees for senior positions
+        if any(term in job_title for term in ['senior', 'lead', 'principal', 'manager', 'director']):
+            if any(term in education_text for term in ['master', 'phd', 'doctorate']):
+                return 1.0
+            elif any(term in education_text for term in ['bachelor', 'degree']):
+                return 0.7
+            else:
+                return 0.3
+        else:
+            # Entry/mid-level positions
+            if any(term in education_text for term in ['bachelor', 'degree', 'master']):
+                return 1.0
+            else:
+                return 0.5
+
     def _score_experience(self, candidate: CandidateProfile, job: JobProfile, weights_cfg: Dict[str, Any]) -> tuple:
         """Score experience match."""
         reasons = []

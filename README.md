@@ -1,7 +1,7 @@
-# Employee Suggester (Resume → Roles & Training)
+# Employee Suggester v1.3.0.0 (Resume → Roles & Training)
 
-This project recommends roles and training courses from a resume.  
-**This milestone** sets up repo scaffolding, seed data, and a working ingestion API that parses PDF/DOCX/TXT resumes, detects scanned PDFs, and uses OCR (if available).
+This project recommends roles and training courses from a resume using advanced matching algorithms.  
+**v1.3.0.0** introduces enhanced matching that analyzes skills, projects, and education for more accurate role recommendations.
 
 ## Repo Structure
 
@@ -72,6 +72,29 @@ python scripts/quick_test.py
 **What you should see:**
 - A printed list of extracted skills from the sample resume.
 - Top job matches re-scored with skill overlap, including which must-have skills you already have and which are missing.
+
+## v1.3.0.0 Enhanced Matching Features
+
+### New Analysis Components
+- **Skills Analysis (40% weight)**: Matches required and nice-to-have skills with candidate skills
+- **Project Analysis (25% weight)**: Evaluates project relevance to job requirements using keyword matching
+- **Education Analysis (20% weight)**: Assesses degree level and field relevance to job seniority
+- **Experience Analysis (10% weight)**: Considers relevant work experience
+- **Domain Analysis (3% weight)**: Department/domain matching
+- **Location Analysis (2% weight)**: Geographic compatibility
+
+### Enhanced Reasons Display
+The Job Matches tab now shows detailed breakdowns of why each role matches, including:
+- Specific skills that align with requirements
+- Relevant projects that demonstrate capabilities
+- Educational background that supports the role
+- Experience level appropriateness
+- Location and domain considerations
+
+### Backward Compatibility
+- Original `/suggest/roles` endpoint still works
+- New `/suggest/roles/v2` endpoint provides enhanced analysis
+- Frontend automatically tries enhanced endpoint first, falls back to basic if needed
 
 ## Next Milestones
 

@@ -4,11 +4,11 @@ You’ve already set everything up. To run the servers:
 
 ##Terminal 1 — start the API
 cd "C:\xampp\htdocs\Employee Suggestion System - Resume Based\employee-suggester"
-uvicorn backend.app:app --host 127.0.0.1 --port 8001
+uvicorn backend.app:app --host 127.0.0.1 --port 8002
 
 
 Check the API docs at:
-http://127.0.0.1:8001/docs
+http://127.0.0.1:8002/docs
 
 ##Terminal 2 — start the web page
 cd "C:\xampp\htdocs\Employee Suggestion System - Resume Based\employee-suggester"

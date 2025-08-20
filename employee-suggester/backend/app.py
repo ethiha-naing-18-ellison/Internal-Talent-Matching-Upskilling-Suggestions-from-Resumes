@@ -87,3 +87,77 @@ def suggest_roles_api(
         })
     rescored.sort(key=lambda x: x["score"], reverse=True)
     return {"roles": rescored[:topk]}
+
+@app.get("/suggest/roles/v2")
+def suggest_roles_enhanced_api(
+    resume_text: str = Query(..., description="Paste resume text here"),
+    topk: int = Query(5, ge=1, le=20)
+):
+    """
+    Enhanced role suggestion using v1.3.0.0 matching logic.
+    Includes skills, projects, and education analysis.
+    """
+    from .services.resume_parser import ResumeParser
+    from .services.matcher import Matcher
+    from .schemas.common import CandidateProfile, Skill, JobProfile, JobSkillReq
+    
+    # Parse resume to get structured data
+    parser = ResumeParser()
+    parsed_data = parser.parse_resume_text(resume_text)
+    
+    # Extract skills
+    skills = _extract_skills(resume_text)
+    
+    # Create candidate profile
+    candidate_skills = [Skill(name=skill, canonical=skill, level=2) for skill in skills]
+    candidate = CandidateProfile(
+        skills=candidate_skills,
+        projects=parsed_data.get('projects', []),
+        education=parsed_data.get('education', []),
+        roles=parsed_data.get('roles', []),
+        certs=parsed_data.get('certs', []),
+        location=parsed_data.get('location'),
+        dept=parsed_data.get('dept')
+    )
+    
+    # Get job candidates
+    jobs_idx = str(MODELS_DIR / "jobs.index")
+    jobs_meta = str(MODELS_DIR / "jobs.meta.jsonl")
+    hits = search(jobs_idx, jobs_meta, resume_text, topk=20)
+    
+    # Use enhanced matcher
+    matcher = Matcher()
+    rescored = []
+    
+    for r in hits:
+        j = r["raw"]
+        
+        # Convert job data to JobProfile
+        required_skills = [JobSkillReq(skill=skill, min_level=1) for skill in j.get("must_have", [])]
+        job_profile = JobProfile(
+            id=j.get("id", ""),
+            title=j.get("title", ""),
+            dept=j.get("dept"),
+            location=j.get("location"),
+            required=required_skills,
+            nice=j.get("nice_to_have", [])
+        )
+        
+        # Score using enhanced matcher
+        result = matcher.score_candidate_to_job(candidate, job_profile)
+        
+        # Extract matched and missing skills for backward compatibility
+        have = [skill.name for skill in candidate_skills if skill.name in j.get("must_have", [])]
+        miss = [skill for skill in j.get("must_have", []) if skill not in [s.name for s in candidate_skills]]
+        
+        rescored.append({
+            "job_id": j.get("id"),
+            "title": j.get("title"),
+            "score": result['score'],
+            "matched_skills": have,
+            "missing_skills": miss,
+            "enhanced_reasons": [reason.dict() for reason in result['reasons']]
+        })
+    
+    rescored.sort(key=lambda x: x["score"], reverse=True)
+    return {"roles": rescored[:topk], "version": "1.3.0.0"}

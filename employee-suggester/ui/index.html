@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <!-- Primary SEO -->
-    <title>Employee Suggester v1.2.0.0</title>
+    <title>Employee Suggester v1.3.0.0</title>
     <meta name="description" content="Paste a resume and instantly get suggested roles with matched & missing skills. Supports PDF/DOCX/TXT. Open-source MVP.">
     <link rel="canonical" href="http://127.0.0.1:8080/">
 
@@ -32,7 +32,7 @@
     <link rel="manifest" href="/site.webmanifest">
 
     <!-- Performance hints (optional) -->
-    <link rel="preconnect" href="http://127.0.0.1:8001" crossorigin>
+    <link rel="preconnect" href="http://127.0.0.1:8002" crossorigin>
     
     <!-- API Configuration -->
     <meta name="api-base" content="">
@@ -932,8 +932,25 @@
                 flex-direction: column;
             }
         }
-        @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
-    </style>
+                 @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+         
+         /* Analysis Card Dropdown Styles */
+         .analysis-card details[open] summary .fa-chevron-down {
+             transform: rotate(180deg);
+         }
+         
+         .analysis-card summary::-webkit-details-marker {
+             display: none;
+         }
+         
+         .analysis-card details[open] summary div:last-child {
+             transform: rotate(180deg);
+         }
+         
+         .analysis-card summary div:last-child {
+             transition: transform 0.3s ease;
+         }
+     </style>
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -1014,7 +1031,7 @@
                     <span>matches</span>
                 </div>
                 <div class="input-group">
-                    <span style="color: var(--muted); font-size: 0.875rem;">v1.2.0.0</span>
+                    <span style="color: var(--muted); font-size: 0.875rem;">v1.3.0.0</span>
                 </div>
                 <button class="btn btn-success" onclick="suggest()">
                     <i class="fas fa-search"></i>
@@ -1036,35 +1053,38 @@
             
             <!-- Enhanced Results Tabs -->
             <div id="enhanced-tabs" style="display: none; margin-bottom: 1.5rem;">
-                <div style="display: flex; gap: 0.5rem; background: var(--bg); border-radius: var(--radius); padding: 0.25rem; margin-bottom: 1rem;">
-                    <button class="tab-btn active" onclick="showTab('profile')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Profile</button>
-                    <button class="tab-btn" onclick="showTab('matches')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Job Matches</button>
-                    <button class="tab-btn" onclick="showTab('upskill')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Upskilling</button>
-                </div>
+                                 <div style="display: flex; gap: 0.5rem; background: var(--bg); border-radius: var(--radius); padding: 0.25rem; margin-bottom: 1rem;">
+                     <button class="tab-btn active" onclick="showTab('matches')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Job Matches</button>
+                     <button class="tab-btn" onclick="showTab('profile')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Profile</button>
+                     <button class="tab-btn" onclick="showTab('upskill')" style="padding: 0.5rem 1rem; border: none; border-radius: var(--radius); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.3s ease;">Upskilling</button>
+                 </div>
                 
-                <!-- Profile Tab -->
-                <div id="profile-tab" class="tab-content active" style="display: block;">
-                    <div id="profile-content"></div>
-                </div>
-                
-                <!-- Matches Tab -->
-                <div id="matches-tab" class="tab-content" style="display: none;">
-                    <div id="matches-content"></div>
-                    <!-- Job Matching Table moved here from Profile -->
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-briefcase"></i> Role</th>
-                                    <th><i class="fas fa-star"></i> Match Score</th>
-                                    <th><i class="fas fa-check-circle"></i> Your Skills</th>
-                                    <th><i class="fas fa-exclamation-circle"></i> Skills to Learn</th>
-                                </tr>
-                            </thead>
-                            <tbody id="results-body">
-                            </tbody>
-                        </table>
-                    </div>
+                                 <!-- Matches Tab -->
+                 <div id="matches-tab" class="tab-content active" style="display: block;">
+                     <!-- Job Matching Table moved to top -->
+                     <div class="table-container" style="margin-bottom: 2rem;">
+                         <table class="table">
+                             <thead>
+                                 <tr>
+                                     <th><i class="fas fa-briefcase"></i> Role</th>
+                                     <th><i class="fas fa-star"></i> Match Score</th>
+                                     <th><i class="fas fa-check-circle"></i> Your Skills</th>
+                                     <th><i class="fas fa-exclamation-circle"></i> Skills to Learn</th>
+                                 </tr>
+                             </thead>
+                             <tbody id="results-body">
+                             </tbody>
+                         </table>
+                     </div>
+                     
+                     <!-- Enhanced Analysis Cards -->
+                     <div id="matches-content"></div>
+                 </div>
+                 
+                 <!-- Profile Tab -->
+                 <div id="profile-tab" class="tab-content" style="display: none;">
+                     <div id="profile-content"></div>
+                 </div>
                 </div>
                 
                 <!-- Upskilling Tab -->
@@ -1233,7 +1253,7 @@
     <script>
         const META_API = document.querySelector('meta[name="api-base"]')?.content?.trim();
         const STORED_API = localStorage.getItem('API_BASE');
-        const DEFAULT_API = "http://127.0.0.1:8001";
+        const DEFAULT_API = "http://127.0.0.1:8002";
         window.API_BASE = STORED_API || META_API || DEFAULT_API;
         const API = window.API_BASE;
 
@@ -1386,10 +1406,10 @@
                 // Step 3: Display enhanced matches (will use data from basic results table)
                 displayMatches([]);
                 
-                // Step 4: Generate upskilling plans (optional)
+                // Step 4: Generate upskilling plans from table data
                 try {
-                    const upskillPlans = await generateUpskillingPlans({ matches: [] });
-                    displayUpskillingPlans(upskillPlans.plan);
+                    // Call displayUpskillingPlans without parameters so it reads from the populated table
+                    await displayUpskillingPlans();
                 } catch (error) {
                     console.warn('Upskilling analysis not available:', error);
                     displayUpskillingPlans([]);
@@ -1407,6 +1427,22 @@
 
         // Basic analysis (original functionality)
         async function performBasicAnalysis(text, k) {
+            // Try enhanced endpoint first (v1.3.0.0)
+            try {
+                const url = `${API}/suggest/roles/v2?topk=${encodeURIComponent(k)}&resume_text=${encodeURIComponent(text)}`;
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    renderResults(result.roles || []);
+                    showNotification(`Found ${result.roles?.length || 0} career matches with enhanced v1.3.0.0 analysis!`);
+                    return result;
+                }
+            } catch (error) {
+                console.warn('Enhanced endpoint failed, falling back to basic:', error);
+            }
+            
+            // Fallback to original endpoint
             const url = `${API}/suggest/roles?topk=${encodeURIComponent(k)}&resume_text=${encodeURIComponent(text)}`;
             const response = await fetch(url);
 
@@ -1625,13 +1661,14 @@
                 const matchedSkills = Array.from(matchedSkillsCell.querySelectorAll('.skill-tag')).map(tag => tag.textContent);
                 const missingSkills = Array.from(missingSkillsCell.querySelectorAll('.skill-tag')).map(tag => tag.textContent);
                 
-                return {
-                    job_id: roleId,
-                    title: roleTitle,
-                    score: score,
-                    matched_skills: matchedSkills,
-                    missing_skills: missingSkills
-                };
+                                 return {
+                     job_id: roleId,
+                     title: roleTitle,
+                     score: score,
+                     matched_skills: matchedSkills,
+                     missing_skills: missingSkills,
+                     enhanced_reasons: row.dataset.enhancedReasons ? JSON.parse(row.dataset.enhancedReasons) : []
+                 };
             }).filter(match => match !== null);
 
             const content = enhancedMatches.map(match => {
@@ -1654,27 +1691,166 @@
                         </div>
                         
                         <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-                            <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Why this match?</h4>
-                            <ul style="list-style: none; padding: 0;">
-                                ${match.matched_skills.length > 0 ? `
-                                    <li style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
-                                        <div style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: rgba(16, 185, 129, 0.2); color: #10b981;">
-                                            <i class="fas fa-check"></i>
+                            <h4 style="color: var(--text-dark); margin-bottom: 0.5rem;">Why this match? (v1.3.0.0 Enhanced Analysis)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <!-- Skills Analysis -->
+                                <div class="analysis-card" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+                                    <details style="cursor: pointer;">
+                                        <summary style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); border-bottom: 1px solid var(--border); list-style: none; font-weight: 600; color: var(--text-dark);">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div>Skills Analysis (40% weight)</div>
+                                                <div style="font-size: 0.875rem; color: var(--muted); font-weight: 400;">
+                                                    ${match.matched_skills.length} skills aligned • ${Math.round(match.score * 40)}% contribution
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 1.2rem; color: #10b981; transition: transform 0.3s ease;">▼</div>
+                                        </summary>
+                                        <div style="padding: 1rem; background: var(--bg-light);">
+                                            ${match.matched_skills.length > 0 ? `
+                                                <div style="margin-bottom: 1rem;">
+                                                    <h5 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 0.9rem;">✅ Matched Skills:</h5>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                                        ${match.matched_skills.map(skill => `
+                                                            <span style="padding: 0.25rem 0.75rem; background: rgba(16, 185, 129, 0.2); color: #10b981; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">
+                                                                ${skill}
+                                                            </span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            ${match.missing_skills.length > 0 ? `
+                                                <div style="margin-bottom: 1rem;">
+                                                    <h5 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 0.9rem;">❌ Missing Skills:</h5>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                                        ${match.missing_skills.map(skill => `
+                                                            <span style="padding: 0.25rem 0.75rem; background: rgba(239, 68, 68, 0.2); color: #ef4444; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">
+                                                                ${skill}
+                                                            </span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                <strong>Analysis:</strong> Skills are the most critical factor in job matching. We evaluate both required and nice-to-have skills, with higher scores for skills that directly match the job requirements. Each matched skill contributes to your overall fit score.
+                                            </div>
                                         </div>
-                                        <div style="flex: 1;">Strong skill match: ${match.matched_skills.length} skills aligned</div>
-                                        <div style="font-size: 0.75rem; color: var(--muted);">${Math.round(match.score * 100)}%</div>
-                                    </li>
-                                ` : ''}
-                                ${match.matched_skills.slice(0, 3).map(skill => `
-                                    <li style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1);">
-                                        <div style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
-                                            <i class="fas fa-star"></i>
+                                    </details>
+                                </div>
+
+                                <!-- Project Analysis -->
+                                <div class="analysis-card" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+                                    <details style="cursor: pointer;">
+                                        <summary style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); border-bottom: 1px solid var(--border); list-style: none; font-weight: 600; color: var(--text-dark);">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div>Project Analysis (25% weight)</div>
+                                                <div style="font-size: 0.875rem; color: var(--muted); font-weight: 400;">
+                                                    Project relevance evaluated • ${Math.round(match.score * 25)}% contribution
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 1.2rem; color: #f59e0b; transition: transform 0.3s ease;">▼</div>
+                                        </summary>
+                                        <div style="padding: 1rem; background: var(--bg-light);">
+                                            <div style="margin-bottom: 1rem;">
+                                                <h5 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 0.9rem;">🔍 Project Evaluation:</h5>
+                                                <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid #f59e0b;">
+                                                    <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                        <strong>How it works:</strong> We analyze your project descriptions for keywords and technologies that match the job requirements. Projects that demonstrate relevant technical skills, problem-solving abilities, and domain knowledge receive higher scores.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                <strong>Impact:</strong> Relevant projects show practical application of skills and demonstrate your ability to deliver real-world solutions. They're particularly valuable for technical roles where hands-on experience is crucial.
+                                            </div>
                                         </div>
-                                        <div style="flex: 1;">Key skill: ${skill}</div>
-                                        <div style="font-size: 0.75rem; color: var(--muted);">${Math.round((match.score * 100) / match.matched_skills.length)}%</div>
-                                    </li>
-                                `).join('')}
-                            </ul>
+                                    </details>
+                                </div>
+
+                                <!-- Education Analysis -->
+                                <div class="analysis-card" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+                                    <details style="cursor: pointer;">
+                                        <summary style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05)); border-bottom: 1px solid var(--border); list-style: none; font-weight: 600; color: var(--text-dark);">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">
+                                                <i class="fas fa-graduation-cap"></i>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div>Education Analysis (20% weight)</div>
+                                                <div style="font-size: 0.875rem; color: var(--muted); font-weight: 400;">
+                                                    Degree relevance assessed • ${Math.round(match.score * 20)}% contribution
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 1.2rem; color: #8b5cf6; transition: transform 0.3s ease;">▼</div>
+                                        </summary>
+                                        <div style="padding: 1rem; background: var(--bg-light);">
+                                            <div style="margin-bottom: 1rem;">
+                                                <h5 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 0.9rem;">🎓 Education Evaluation:</h5>
+                                                <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid #8b5cf6;">
+                                                    <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                        <strong>Degree Level:</strong> We assess whether your education level matches the job's seniority requirements. Senior positions typically require higher degrees, while entry-level roles may accept bachelor's degrees.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                <strong>Field Relevance:</strong> We evaluate how closely your field of study aligns with the job requirements. Degrees in related fields (e.g., Computer Science for software engineering) receive higher scores than unrelated degrees.
+                                            </div>
+                                        </div>
+                                    </details>
+                                </div>
+
+                                <!-- Experience Analysis -->
+                                <div class="analysis-card" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+                                    <details style="cursor: pointer;">
+                                        <summary style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.05)); border-bottom: 1px solid var(--border); list-style: none; font-weight: 600; color: var(--text-dark);">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
+                                                <i class="fas fa-briefcase"></i>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div>Experience Analysis (10% weight)</div>
+                                                <div style="font-size: 0.875rem; color: var(--muted); font-weight: 400;">
+                                                    Work experience evaluated • ${Math.round(match.score * 10)}% contribution
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 1.2rem; color: #0ea5e9; transition: transform 0.3s ease;">▼</div>
+                                        </summary>
+                                        <div style="padding: 1rem; background: var(--bg-light);">
+                                            <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                <strong>Experience Matching:</strong> We evaluate your work history for roles that are relevant to the target position. Previous experience in similar roles or industries demonstrates your ability to perform the required duties and adapt to the work environment.
+                                            </div>
+                                        </div>
+                                    </details>
+                                </div>
+
+                                <!-- Domain & Location Analysis -->
+                                <div class="analysis-card" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+                                    <details style="cursor: pointer;">
+                                        <summary style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05)); border-bottom: 1px solid var(--border); list-style: none; font-weight: 600; color: var(--text-dark);">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(99, 102, 241, 0.2); color: #6366f1;">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div>Domain & Location (5% weight)</div>
+                                                <div style="font-size: 0.875rem; color: var(--muted); font-weight: 400;">
+                                                    Department & geographic fit • ${Math.round(match.score * 5)}% contribution
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 1.2rem; color: #6366f1; transition: transform 0.3s ease;">▼</div>
+                                        </summary>
+                                        <div style="padding: 1rem; background: var(--bg-light);">
+                                            <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5;">
+                                                <strong>Domain Match:</strong> We evaluate whether your background aligns with the company's industry or department. Experience in similar domains can provide valuable context and industry knowledge.
+                                            </div>
+                                            <div style="font-size: 0.85rem; color: var(--text-gray); line-height: 1.5; margin-top: 0.5rem;">
+                                                <strong>Location Compatibility:</strong> Geographic considerations include whether you're willing to relocate, work remotely, or commute to the job location. This affects practical feasibility of the role.
+                                            </div>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
                         </div>
                         
                         <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
@@ -1704,44 +1880,677 @@
         }
 
         // Display upskilling plans
-        function displayUpskillingPlans(plans) {
-            if (!plans || plans.length === 0) {
+        async function displayUpskillingPlans(plans = null) {
+            // If plans parameter is provided, use it (fallback mode)
+            if (plans !== null) {
+                // Fallback to basic upskilling display
+                const upskillingContent = generateUpskillingRecommendations(plans, []);
+                document.getElementById('upskill-content').innerHTML = upskillingContent;
+                return;
+            }
+            
+            // Get missing skills from the results table
+            const resultsBody = document.getElementById('results-body');
+            const rows = resultsBody.querySelectorAll('tr');
+            
+            if (!rows || rows.length === 0) {
                 document.getElementById('upskill-content').innerHTML = `
                     <div class="card">
                         <h3 style="color: var(--text-dark);">Upskilling Recommendations</h3>
-                        <p>Enhanced upskilling analysis is not available. Please check the Job Matches tab to see skill gaps.</p>
+                        <p>No job matches found. Please run a search first to get personalized upskilling recommendations.</p>
                     </div>
                 `;
                 return;
             }
 
-            const content = plans.map(plan => `
-                <div class="card" style="margin-bottom: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="color: var(--text-dark);">${plan.skill || 'Skill'}</h3>
-                        <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">${plan.eta_weeks || 'N/A'} weeks</span>
-                    </div>
+            // Collect all missing skills and job matches data
+            const allMissingSkills = new Set();
+            const jobMatches = [];
+            const resumeSkills = new Set();
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 4) {
+                    const roleTitle = cells[0].querySelector('.role-title')?.textContent || 'Unknown Role';
+                    const scoreText = cells[1].querySelector('.score')?.textContent || '0%';
+                    const score = parseFloat(scoreText.replace('%', '')) / 100;
+                    const matchedSkills = Array.from(cells[2].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                    const missingSkills = Array.from(cells[3].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
                     
-                    <div>
-                        ${(plan.items || []).map(item => `
-                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg); border-radius: var(--radius); margin-bottom: 0.5rem;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; color: var(--text-dark);">${item.label || 'Learning Item'}</div>
-                                    <div style="font-size: 0.875rem; color: var(--muted);">
-                                        ${item.hours || 'N/A'} hours • ${item.type || 'Course'}
-                                        ${(item.prereqs || []).length > 0 ? ` • Prereqs: ${item.prereqs.join(', ')}` : ''}
-                                    </div>
+                    // Add to resume skills
+                    matchedSkills.forEach(skill => resumeSkills.add(skill.toLowerCase()));
+                    
+                    // Add to missing skills
+                    missingSkills.forEach(skill => allMissingSkills.add(skill));
+                    
+                    // Add to job matches
+                    jobMatches.push({
+                        title: roleTitle,
+                        score: score,
+                        missing_skills: missingSkills
+                    });
+                }
+            });
+
+            // Always call the backend API for upskilling recommendations, even with perfect matches
+            // This ensures we get personalized recommendations for continuous improvement
+
+            try {
+                // Call enhanced upskilling API
+                const response = await fetch(`${API}/upskill/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume_skills: Array.from(resumeSkills),
+                        job_matches: jobMatches
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get enhanced upskilling recommendations');
+                }
+
+                const upskillingData = await response.json();
+                const upskillingContent = generateEnhancedUpskillingContent(upskillingData);
+                document.getElementById('upskill-content').innerHTML = upskillingContent;
+                
+            } catch (error) {
+                console.warn('Enhanced upskilling failed, falling back to basic:', error);
+                // Fallback to basic upskilling
+                const upskillingContent = generateUpskillingRecommendations(Array.from(allMissingSkills), jobMatches);
+                document.getElementById('upskill-content').innerHTML = upskillingContent;
+            }
+        }
+
+                 // Generate enhanced upskilling content from backend data
+         function generateEnhancedUpskillingContent(upskillingData) {
+             const { overall_strategy, target_role, skill_recommendations, priority_skills } = upskillingData;
+             
+             // Generate overall strategy section
+             const overallStrategy = `
+                 <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.1)); border: 1px solid var(--primary);">
+                     <h3 style="color: var(--text-dark); margin-bottom: 1rem;">🎯 Overall Improvement Strategy</h3>
+                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1rem;">
+                         <div>
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">Current Status</h4>
+                             <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
+                                 <div style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">Highest Match Score</div>
+                                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${overall_strategy.currentScore}%</div>
+                                 <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.25rem;">
+                                     ${priority_skills.length} skills to improve
+                                 </div>
+                             </div>
+                         </div>
+                         <div>
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">Target Goal</h4>
+                             <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
+                                 <div style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">Target Match Score</div>
+                                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${overall_strategy.targetScore}%</div>
+                                 <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.25rem;">
+                                     +${overall_strategy.improvementNeeded}% improvement needed
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius); margin-bottom: 1rem;">
+                         <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">🎯 Target Role: ${target_role}</h4>
+                         <div style="color: var(--text-gray); line-height: 1.6;">
+                             <p style="margin-bottom: 0.5rem;">Focus on developing skills for <strong>${target_role}</strong> role</p>
+                             <p style="font-size: 0.875rem; color: var(--muted);">Based on your resume analysis and job matches.</p>
+                         </div>
+                     </div>
+                     <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
+                         <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">📈 Action Plan</h4>
+                         <ul style="color: var(--text-gray); line-height: 1.6; padding-left: 1.5rem;">
+                             <li>Focus on <strong>${overall_strategy.totalSkillsToLearn}</strong> priority skills identified</li>
+                             <li>Complete recommended courses and projects for each skill</li>
+                             <li>Build portfolio projects to demonstrate practical expertise</li>
+                             <li>Target completion: <strong>${overall_strategy.estimatedWeeks} weeks</strong></li>
+                         </ul>
+                     </div>
+                 </div>
+             `;
+             
+             // Generate skill-specific recommendations
+             const skillCards = skill_recommendations.map(recommendation => {
+                 const { skill, type, difficulty, timeToLearn, isPriorityForRole, resources, projects, roleRelevance } = recommendation;
+                 
+                 const priorityBadge = isPriorityForRole ? 
+                     '<span style="background: #ef4444; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem;">High Priority</span>' : '';
+                 
+                 const relevanceColor = roleRelevance === 'High Priority' ? '#ef4444' : 
+                                      roleRelevance === 'Secondary' ? '#f59e0b' : '#6b7280';
+                 
+                 return `
+                     <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                             <div>
+                                 <h3 style="color: var(--text-dark); margin-bottom: 0.5rem;">${skill.charAt(0).toUpperCase() + skill.slice(1)} ${priorityBadge}</h3>
+                                 <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: var(--muted);">
+                                     <span>${type}</span>
+                                     <span>•</span>
+                                     <span>${difficulty}</span>
+                                     <span>•</span>
+                                     <span>${timeToLearn}</span>
+                                     <span>•</span>
+                                     <span style="color: ${relevanceColor};">${roleRelevance}</span>
+                                 </div>
+                             </div>
+                             <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">
+                                 ${timeToLearn}
+                             </span>
+                         </div>
+                         
+                         <div style="margin-bottom: 1.5rem;">
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.75rem; font-size: 1rem;">📚 Learning Resources</h4>
+                             <div style="display: grid; gap: 0.75rem;">
+                                 ${resources.map(resource => `
+                                     <div style="padding: 1rem; background: var(--bg); border-radius: var(--radius); border-left: 3px solid var(--success);">
+                                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                             <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                                                 <i class="fas fa-graduation-cap"></i>
+                                             </div>
+                                             <div>
+                                                 <div style="font-weight: 600; color: var(--text-dark);">${resource.name}</div>
+                                                 <div style="font-size: 0.875rem; color: var(--muted);">
+                                                     ${resource.type} • ${resource.platform} • ${resource.hours} hours
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         <div style="font-size: 0.875rem; color: var(--text-gray); line-height: 1.5;">
+                                             ${resource.description}
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                             </div>
+                         </div>
+
+                         <div>
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.75rem; font-size: 1rem;">🚀 Project Ideas</h4>
+                             <div style="display: grid; gap: 0.75rem;">
+                                 ${projects.map(project => `
+                                     <div style="padding: 1rem; background: var(--bg); border-radius: var(--radius); border-left: 3px solid var(--warning);">
+                                         <div style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                             <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(245, 158, 11, 0.2); color: #f59e0b; flex-shrink: 0;">
+                                                 <i class="fas fa-project-diagram"></i>
+                                             </div>
+                                             <div style="flex: 1;">
+                                                 <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.25rem;">${project.title}</div>
+                                                 <div style="font-size: 0.875rem; color: var(--text-gray); line-height: 1.5;">
+                                                     ${project.description}
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                             </div>
+                         </div>
+                     </div>
+                 `;
+             }).join('');
+             
+             return overallStrategy + skillCards;
+         }
+
+         // Generate comprehensive upskilling recommendations (fallback)
+         function generateUpskillingRecommendations(missingSkills, matchData) {
+                         const skillRecommendations = {
+                 'Python': {
+                     type: 'Programming Language',
+                     difficulty: 'Intermediate',
+                     timeToLearn: '4-6 weeks',
+                     resources: [
+                         { 
+                             name: 'Python for Data Science', 
+                             type: 'Course', 
+                             platform: 'Coursera', 
+                             hours: 40, 
+                             description: 'Comprehensive course covering Python fundamentals, data manipulation with pandas, visualization with matplotlib, and basic machine learning concepts. Perfect for beginners transitioning to data science.'
+                         },
+                         { 
+                             name: 'Python Crash Course', 
+                             type: 'Book', 
+                             platform: 'No Starch Press', 
+                             hours: 60, 
+                             description: 'Hands-on book with practical projects covering web development, data visualization, and game development. Includes exercises and real-world applications.'
+                         },
+                         { 
+                             name: 'Real Python Tutorials', 
+                             type: 'Tutorial', 
+                             platform: 'Real Python', 
+                             hours: 20, 
+                             description: 'Free, high-quality tutorials covering Python basics, web development, data science, and advanced topics. Great for self-paced learning.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'Web Scraper with BeautifulSoup',
+                             description: 'Build a web scraper that extracts data from websites, handles different HTML structures, and saves data to CSV/JSON files. Learn about HTTP requests, HTML parsing, and data cleaning.'
+                         },
+                         {
+                             title: 'Data Analysis Dashboard with Streamlit',
+                             description: 'Create an interactive web application for data visualization and analysis. Include charts, filters, and real-time data updates. Perfect for showcasing data science skills.'
+                         },
+                         {
+                             title: 'REST API with FastAPI',
+                             description: 'Develop a modern, fast web API with automatic documentation, data validation, and async support. Include CRUD operations, authentication, and database integration.'
+                         }
+                     ]
+                 },
+                                 'SQL': {
+                     type: 'Database Language',
+                     difficulty: 'Beginner',
+                     timeToLearn: '2-3 weeks',
+                     resources: [
+                         { 
+                             name: 'SQL for Data Science', 
+                             type: 'Course', 
+                             platform: 'DataCamp', 
+                             hours: 25, 
+                             description: 'Interactive course focusing on SQL queries for data analysis, including joins, aggregations, window functions, and optimization techniques. Includes hands-on exercises with real datasets.'
+                         },
+                         { 
+                             name: 'SQL Tutorial', 
+                             type: 'Tutorial', 
+                             platform: 'W3Schools', 
+                             hours: 15, 
+                             description: 'Free comprehensive tutorial covering SQL basics, advanced queries, database design, and best practices. Includes interactive examples and exercises.'
+                         },
+                         { 
+                             name: 'LeetCode SQL Problems', 
+                             type: 'Practice', 
+                             platform: 'LeetCode', 
+                             hours: 30, 
+                             description: 'Practice solving real-world SQL problems with varying difficulty levels. Great for improving query optimization and problem-solving skills.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'E-commerce Database Design',
+                             description: 'Design a complete database schema for an online store including products, customers, orders, and inventory. Implement complex queries for sales analytics, customer segmentation, and inventory management.'
+                         },
+                         {
+                             title: 'Business Analytics Dashboard',
+                             description: 'Create comprehensive SQL queries for business intelligence including sales trends, customer behavior analysis, and performance metrics. Focus on optimization and data visualization integration.'
+                         },
+                         {
+                             title: 'Data Pipeline with SQL and Python',
+                             description: 'Build an ETL pipeline that extracts data from multiple sources, transforms it using SQL, and loads it into a data warehouse. Include data quality checks and monitoring.'
+                         }
+                     ]
+                 },
+                                 'Machine Learning': {
+                     type: 'AI/ML',
+                     difficulty: 'Advanced',
+                     timeToLearn: '8-12 weeks',
+                     resources: [
+                         { 
+                             name: 'Machine Learning Course', 
+                             type: 'Course', 
+                             platform: 'Stanford Online', 
+                             hours: 80, 
+                             description: 'Comprehensive course covering supervised and unsupervised learning, neural networks, and practical applications. Includes mathematical foundations and hands-on projects with real-world datasets.'
+                         },
+                         { 
+                             name: 'Hands-On Machine Learning', 
+                             type: 'Book', 
+                             platform: 'O\'Reilly', 
+                             hours: 100, 
+                             description: 'Practical guide to machine learning with scikit-learn, TensorFlow, and Keras. Covers end-to-end ML projects from data preprocessing to model deployment.'
+                         },
+                         { 
+                             name: 'Kaggle Courses', 
+                             type: 'Course', 
+                             platform: 'Kaggle', 
+                             hours: 50, 
+                             description: 'Free courses on Python, machine learning, and deep learning. Includes hands-on exercises and access to real datasets for practice.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'Customer Churn Prediction Model',
+                             description: 'Develop a machine learning model to predict customer churn using historical data. Include feature engineering, model selection, hyperparameter tuning, and deployment considerations. Focus on business impact and interpretability.'
+                         },
+                         {
+                             title: 'Image Classification System',
+                             description: 'Build a deep learning model for image classification using CNN architectures. Include data augmentation, transfer learning, and model optimization. Deploy the model as a web service with real-time predictions.'
+                         },
+                         {
+                             title: 'Recommendation Engine',
+                             description: 'Create a recommendation system using collaborative filtering and content-based approaches. Implement both user-based and item-based recommendations with evaluation metrics and A/B testing framework.'
+                         }
+                     ]
+                 },
+                                 'React': {
+                     type: 'Frontend Framework',
+                     difficulty: 'Intermediate',
+                     timeToLearn: '6-8 weeks',
+                     resources: [
+                         { 
+                             name: 'React Tutorial', 
+                             type: 'Course', 
+                             platform: 'React Official', 
+                             hours: 35, 
+                             description: 'Official React documentation and tutorials covering hooks, components, state management, and modern React patterns. Includes interactive examples and best practices.'
+                         },
+                         { 
+                             name: 'Full Stack Open', 
+                             type: 'Course', 
+                             platform: 'University of Helsinki', 
+                             hours: 120, 
+                             description: 'Comprehensive full-stack development course covering React, Node.js, databases, and deployment. Includes modern JavaScript, testing, and CI/CD practices.'
+                         },
+                         { 
+                             name: 'React Projects on YouTube', 
+                             type: 'Tutorial', 
+                             platform: 'YouTube', 
+                             hours: 25, 
+                             description: 'Free video tutorials covering React fundamentals, advanced concepts, and real-world project building. Great for visual learners and hands-on practice.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'Task Management Application',
+                             description: 'Build a full-featured task management app with React hooks, local storage, drag-and-drop functionality, and responsive design. Include user authentication, task categories, and progress tracking.'
+                         },
+                         {
+                             title: 'Portfolio Website',
+                             description: 'Create a modern, responsive portfolio website using React with smooth animations, contact forms, and project showcases. Include SEO optimization and performance best practices.'
+                         },
+                         {
+                             title: 'Real-time Chat Application',
+                             description: 'Develop a real-time chat app using React, WebSocket connections, and a backend API. Include user authentication, message history, file sharing, and online status indicators.'
+                         }
+                     ]
+                 },
+                                 'Docker': {
+                     type: 'DevOps',
+                     difficulty: 'Intermediate',
+                     timeToLearn: '3-4 weeks',
+                     resources: [
+                         { 
+                             name: 'Docker for Beginners', 
+                             type: 'Course', 
+                             platform: 'Docker Official', 
+                             hours: 20, 
+                             description: 'Official Docker tutorial covering container basics, Dockerfile creation, image management, and container orchestration. Includes hands-on labs and real-world examples.'
+                         },
+                         { 
+                             name: 'Docker Deep Dive', 
+                             type: 'Book', 
+                             platform: 'Packt', 
+                             hours: 40, 
+                             description: 'Comprehensive guide to Docker internals, advanced networking, security best practices, and production deployment strategies. Covers Docker Compose and Swarm.'
+                         },
+                         { 
+                             name: 'Docker Tutorial on YouTube', 
+                             type: 'Tutorial', 
+                             platform: 'YouTube', 
+                             hours: 15, 
+                             description: 'Free video tutorials covering Docker fundamentals, practical examples, and common use cases. Great for visual learners and quick reference.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'Web Application Containerization',
+                             description: 'Containerize a full-stack web application with separate containers for frontend, backend, and database. Include Docker Compose for local development and production deployment considerations.'
+                         },
+                         {
+                             title: 'Microservices Architecture',
+                             description: 'Design and implement a microservices architecture using Docker containers. Include service discovery, load balancing, and monitoring. Deploy using Docker Swarm or Kubernetes.'
+                         },
+                         {
+                             title: 'CI/CD Pipeline with Docker',
+                             description: 'Build a complete CI/CD pipeline using Docker, GitHub Actions, and cloud deployment. Include automated testing, security scanning, and blue-green deployment strategies.'
+                         }
+                     ]
+                 },
+                                 'AWS': {
+                     type: 'Cloud Platform',
+                     difficulty: 'Intermediate',
+                     timeToLearn: '6-8 weeks',
+                     resources: [
+                         { 
+                             name: 'AWS Cloud Practitioner', 
+                             type: 'Certification', 
+                             platform: 'AWS', 
+                             hours: 60, 
+                             description: 'Foundation-level AWS certification covering cloud concepts, security, architecture, pricing, and support. Includes hands-on labs and practice exams for comprehensive preparation.'
+                         },
+                         { 
+                             name: 'AWS Solutions Architect', 
+                             type: 'Course', 
+                             platform: 'A Cloud Guru', 
+                             hours: 80, 
+                             description: 'Comprehensive course preparing for AWS Solutions Architect certification. Covers advanced AWS services, architecture patterns, and real-world deployment scenarios.'
+                         },
+                         { 
+                             name: 'AWS Tutorials', 
+                             type: 'Tutorial', 
+                             platform: 'AWS Official', 
+                             hours: 30, 
+                             description: 'Free official AWS tutorials covering core services, best practices, and hands-on projects. Includes step-by-step guides and sample code.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'Web Application Deployment on AWS',
+                             description: 'Deploy a full-stack web application using AWS services including EC2, RDS, S3, and CloudFront. Implement auto-scaling, load balancing, and monitoring with CloudWatch.'
+                         },
+                         {
+                             title: 'Serverless Architecture',
+                             description: 'Build a serverless application using AWS Lambda, API Gateway, DynamoDB, and S3. Include event-driven architecture, authentication, and cost optimization strategies.'
+                         },
+                         {
+                             title: 'Data Pipeline with AWS Services',
+                             description: 'Create a data processing pipeline using AWS Glue, S3, Redshift, and QuickSight. Include ETL processes, data warehousing, and business intelligence dashboards.'
+                         }
+                     ]
+                 },
+                                 'Data Analysis': {
+                     type: 'Analytics',
+                     difficulty: 'Intermediate',
+                     timeToLearn: '4-6 weeks',
+                     resources: [
+                         { 
+                             name: 'Data Analysis with Python', 
+                             type: 'Course', 
+                             platform: 'Coursera', 
+                             hours: 45, 
+                             description: 'Comprehensive course covering pandas, numpy, matplotlib, and seaborn for data manipulation and visualization. Includes statistical analysis and real-world case studies.'
+                         },
+                         { 
+                             name: 'Python for Data Analysis', 
+                             type: 'Book', 
+                             platform: 'O\'Reilly', 
+                             hours: 70, 
+                             description: 'In-depth guide to data analysis using Python libraries. Covers data cleaning, transformation, aggregation, and visualization with practical examples.'
+                         },
+                         { 
+                             name: 'DataCamp Data Analysis', 
+                             type: 'Course', 
+                             platform: 'DataCamp', 
+                             hours: 35, 
+                             description: 'Interactive course focusing on data analysis workflows, statistical concepts, and visualization techniques. Includes hands-on projects with real datasets.'
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: 'Real-world Dataset Analysis',
+                             description: 'Conduct comprehensive analysis of a real-world dataset (e.g., sales data, customer behavior, or financial data). Include data cleaning, exploratory analysis, statistical testing, and actionable insights.'
+                         },
+                         {
+                             title: 'Interactive Data Visualizations',
+                             description: 'Create interactive dashboards using tools like Plotly, Dash, or Tableau. Include multiple chart types, filters, and drill-down capabilities for comprehensive data exploration.'
+                         },
+                         {
+                             title: 'Business Intelligence Dashboard',
+                             description: 'Build a complete BI dashboard with automated data pipelines, KPI tracking, and executive reporting. Include data refresh mechanisms, alerting, and mobile-responsive design.'
+                         }
+                     ]
+                 }
+            };
+
+            // Generate recommendations for each missing skill
+            const skillCards = missingSkills.map(skill => {
+                                 const recommendation = skillRecommendations[skill] || {
+                     type: 'Technical Skill',
+                     difficulty: 'Intermediate',
+                     timeToLearn: '4-6 weeks',
+                     resources: [
+                         { 
+                             name: `${skill} Fundamentals`, 
+                             type: 'Course', 
+                             platform: 'Online Learning', 
+                             hours: 30, 
+                             description: `Comprehensive course covering ${skill} fundamentals, best practices, and practical applications. Focus on hands-on learning and real-world examples.`
+                         },
+                         { 
+                             name: `${skill} Practice Projects`, 
+                             type: 'Practice', 
+                             platform: 'Various', 
+                             hours: 20, 
+                             description: `Practice exercises and mini-projects to reinforce ${skill} concepts. Include coding challenges, real-world scenarios, and portfolio-building activities.`
+                         }
+                     ],
+                     projects: [
+                         {
+                             title: `Build a ${skill} Project`,
+                             description: `Create a practical application using ${skill} that demonstrates your understanding of core concepts. Include proper documentation, testing, and deployment considerations.`
+                         },
+                         {
+                             title: `Portfolio Piece with ${skill}`,
+                             description: `Develop a showcase project that highlights your ${skill} expertise. Focus on clean code, best practices, and solving real-world problems effectively.`
+                         },
+                         {
+                             title: `Open-source ${skill} Contribution`,
+                             description: `Contribute to an existing open-source project that uses ${skill}. This demonstrates collaboration skills, code review experience, and community involvement.`
+                         }
+                     ]
+                 };
+
+                return `
+                    <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h3 style="color: var(--text-dark); margin-bottom: 0.5rem;">${skill}</h3>
+                                <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: var(--muted);">
+                                    <span>${recommendation.type}</span>
+                                    <span>•</span>
+                                    <span>${recommendation.difficulty}</span>
+                                    <span>•</span>
+                                    <span>${recommendation.timeToLearn}</span>
                                 </div>
                             </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
+                            <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">
+                                ${recommendation.timeToLearn}
+                            </span>
+                        </div>
+                        
+                                                 <div style="margin-bottom: 1.5rem;">
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.75rem; font-size: 1rem;">📚 Learning Resources</h4>
+                             <div style="display: grid; gap: 0.75rem;">
+                                 ${recommendation.resources.map(resource => `
+                                     <div style="padding: 1rem; background: var(--bg); border-radius: var(--radius); border-left: 3px solid var(--success);">
+                                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                             <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                                                 <i class="fas fa-graduation-cap"></i>
+                                             </div>
+                                             <div>
+                                                 <div style="font-weight: 600; color: var(--text-dark);">${resource.name}</div>
+                                                 <div style="font-size: 0.875rem; color: var(--muted);">
+                                                     ${resource.type} • ${resource.platform} • ${resource.hours} hours
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         <div style="font-size: 0.875rem; color: var(--text-gray); line-height: 1.5;">
+                                             ${resource.description || 'Comprehensive learning resource covering fundamental concepts and practical applications.'}
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                             </div>
+                         </div>
 
-            document.getElementById('upskill-content').innerHTML = content;
+                                                 <div>
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.75rem; font-size: 1rem;">🚀 Project Ideas</h4>
+                             <div style="display: grid; gap: 0.75rem;">
+                                 ${recommendation.projects.map(project => `
+                                     <div style="padding: 1rem; background: var(--bg); border-radius: var(--radius); border-left: 3px solid var(--warning);">
+                                         <div style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                             <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: rgba(245, 158, 11, 0.2); color: #f59e0b; flex-shrink: 0;">
+                                                 <i class="fas fa-project-diagram"></i>
+                                             </div>
+                                             <div style="flex: 1;">
+                                                 <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.25rem;">${project.title}</div>
+                                                 <div style="font-size: 0.875rem; color: var(--text-gray); line-height: 1.5;">
+                                                     ${project.description}
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                             </div>
+                         </div>
+                    </div>
+                `;
+            }).join('');
+
+                         // Generate overall improvement strategy
+             const highestScore = Math.max(...matchData.map(m => m.score));
+             const improvementNeeded = 1 - highestScore;
+             const targetScore = Math.min(0.95, highestScore + 0.15); // Aim for 15% improvement or 95%
+             
+             // Get specific missing skills for display
+             const missingSkillsList = missingSkills.slice(0, 3).map(skill => `<strong>${skill}</strong>`).join(', ');
+             const remainingSkills = missingSkills.length > 3 ? ` and ${missingSkills.length - 3} more` : '';
+
+             const overallStrategy = `
+                 <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.1)); border: 1px solid var(--primary);">
+                     <h3 style="color: var(--text-dark); margin-bottom: 1rem;">🎯 Overall Improvement Strategy</h3>
+                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1rem;">
+                         <div>
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">Current Status</h4>
+                             <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
+                                 <div style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">Highest Match Score</div>
+                                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${(highestScore * 100).toFixed(1)}%</div>
+                                 <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.25rem;">
+                                     ${matchData.length} roles analyzed
+                                 </div>
+                             </div>
+                         </div>
+                         <div>
+                             <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">Target Goal</h4>
+                             <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
+                                 <div style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">Target Match Score</div>
+                                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${(targetScore * 100).toFixed(1)}%</div>
+                                 <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.25rem;">
+                                     +${((targetScore - highestScore) * 100).toFixed(1)}% improvement needed
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius); margin-bottom: 1rem;">
+                         <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">🎯 Missing Skills Identified</h4>
+                         <div style="color: var(--text-gray); line-height: 1.6;">
+                             <p style="margin-bottom: 0.5rem;">Based on your analysis, you need to develop: <span style="color: var(--text-dark);">${missingSkillsList}${remainingSkills}</span></p>
+                             <p style="font-size: 0.875rem; color: var(--muted);">These skills were identified as gaps across ${matchData.length} job matches.</p>
+                         </div>
+                     </div>
+                     <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
+                         <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">📈 Action Plan</h4>
+                         <ul style="color: var(--text-gray); line-height: 1.6; padding-left: 1.5rem;">
+                             <li>Focus on the <strong>${missingSkills.length}</strong> missing skills identified above</li>
+                             <li>Complete <strong>${Math.ceil(missingSkills.length * 0.7)}</strong> recommended courses (see detailed recommendations below)</li>
+                             <li>Build <strong>${Math.ceil(missingSkills.length * 0.5)}</strong> portfolio projects (specific project ideas provided for each skill)</li>
+                             <li>Target completion: <strong>${Math.ceil(missingSkills.length * 6)} weeks</strong></li>
+                         </ul>
+                     </div>
+                 </div>
+             `;
+
+            return overallStrategy + skillCards;
         }
 
         // Tab switching function
@@ -1806,34 +2615,34 @@
             resultsSection.classList.add('fade-in');
             resultsCount.textContent = `${roles.length} result${roles.length !== 1 ? 's' : ''}`;
 
-            resultsBody.innerHTML = roles.map(role => `
-                <tr>
-                    <td>
-                        <div class="role-title">${role.title}</div>
-                        <div class="role-id">${role.id}</div>
-                    </td>
-                    <td>
-                        <div class="score ${getScoreClass(role.score)}">
-                            <i class="${getScoreIcon(role.score)}"></i>
-                            ${(role.score * 100).toFixed(1)}%
-                        </div>
-                    </td>
-                    <td>
-                        <div class="skills">
-                            ${role.matched_skills.map(skill => `
-                                <span class="skill-tag skill-matched">${skill}</span>
-                            `).join('')}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="skills">
-                            ${role.missing_skills.map(skill => `
-                                <span class="skill-tag skill-missing">${skill}</span>
-                            `).join('')}
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+                         resultsBody.innerHTML = roles.map(role => `
+                 <tr data-enhanced-reasons='${JSON.stringify(role.enhanced_reasons || [])}'>
+                     <td>
+                         <div class="role-title">${role.title}</div>
+                         <div class="role-id">${role.id}</div>
+                     </td>
+                     <td>
+                         <div class="score ${getScoreClass(role.score)}">
+                             <i class="${getScoreIcon(role.score)}"></i>
+                             ${(role.score * 100).toFixed(1)}%
+                         </div>
+                     </td>
+                     <td>
+                         <div class="skills">
+                             ${role.matched_skills.map(skill => `
+                                 <span class="skill-tag skill-matched">${skill}</span>
+                             `).join('')}
+                         </div>
+                     </td>
+                     <td>
+                         <div class="skills">
+                             ${role.missing_skills.map(skill => `
+                                 <span class="skill-tag skill-missing">${skill}</span>
+                             `).join('')}
+                         </div>
+                     </td>
+                 </tr>
+             `).join('');
         }
 
         // Tab switching function
