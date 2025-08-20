@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Job Categories Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f172a; color: #f1f5f9; }
+        .test { background: #1e293b; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; }
+        .success { border-color: #10b981; }
+        .error { border-color: #ef4444; }
+        .warning { border-color: #f59e0b; }
+        .category-test { margin: 10px 0; padding: 10px; background: #334155; border-radius: 4px; }
+        .summary { background: #1e293b; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 All Job Categories Test</h1>
+    <p>Testing ALL job categories to ensure equal functionality</p>
+    
+    <div class="test">
+        <h3>Test All Job Categories</h3>
+        <button onclick="testAllCategories()">Test All Categories</button>
+        <div id="results"></div>
+    </div>
+    
+    <div class="summary" id="summary" style="display: none;">
+        <h3>📊 Test Summary</h3>
+        <div id="summary-content"></div>
+    </div>
+    
+    <script>
+        const API = 'http://127.0.0.1:8002';
+        
+        // All job categories to test
+        const ALL_CATEGORIES = [
+            "Data Scientist",
+            "Data Engineer", 
+            "Software Engineer",
+            "Frontend Developer",
+            "DevOps Engineer",
+            "Machine Learning Engineer",
+            "Business Analyst",
+            "Cloud Engineer"
+        ];
+        
+        // Test data for each category
+        const TEST_DATA = {
+            "Data Scientist": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["machine learning", "statistics", "tensorflow", "pandas"]
+            },
+            "Data Engineer": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["apache spark", "airflow", "aws", "kubernetes"]
+            },
+            "Software Engineer": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["javascript", "aws", "kubernetes", "microservices"]
+            },
+            "Frontend Developer": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["javascript", "html", "css", "typescript"]
+            },
+            "DevOps Engineer": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["kubernetes", "terraform", "jenkins", "aws"]
+            },
+            "Machine Learning Engineer": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["machine learning", "tensorflow", "pytorch", "aws"]
+            },
+            "Business Analyst": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["data analysis", "excel", "tableau", "power bi"]
+            },
+            "Cloud Engineer": {
+                resume_skills: ["python", "sql", "react", "docker"],
+                missing_skills: ["aws", "azure", "gcp", "kubernetes"]
+            }
+        };
+        
+        async function testAllCategories() {
+            const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
+            const summaryContent = document.getElementById('summary-content');
+            
+            resultsDiv.innerHTML = '<p>Testing all categories...</p>';
+            summaryDiv.style.display = 'none';
+            
+            const results = {};
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const category of ALL_CATEGORIES) {
+                console.log(`Testing ${category}...`);
+                
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-test';
+                categoryDiv.innerHTML = `<h4>🎯 Testing ${category}...</h4>`;
+                resultsDiv.appendChild(categoryDiv);
+                
+                try {
+                    const testData = TEST_DATA[category];
+                    const response = await fetch(`${API}/upskill/enhanced`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            resume_skills: testData.resume_skills,
+                            job_matches: [{
+                                title: category,
+                                score: 0.771,
+                                missing_skills: testData.missing_skills
+                            }],
+                            target_role: category
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API failed: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    const prioritySkills = result.priority_skills || [];
+                    const skillRecommendations = result.skill_recommendations || [];
+                    
+                    // Check if this category works correctly
+                    const hasSkills = prioritySkills.length > 0;
+                    const hasRecommendations = skillRecommendations.length > 0;
+                    const showsContinuousImprovement = !hasSkills && !hasRecommendations;
+                    
+                    if (showsContinuousImprovement) {
+                        categoryDiv.innerHTML += `
+                            <div class="error">
+                                <p>❌ ${category}: Shows continuous improvement (WRONG for 77.1% match)</p>
+                                <p>Priority Skills: ${prioritySkills.length}</p>
+                                <p>Skill Recommendations: ${skillRecommendations.length}</p>
+                            </div>
+                        `;
+                        errorCount++;
+                        results[category] = { status: 'error', reason: 'shows_continuous_improvement' };
+                    } else {
+                        categoryDiv.innerHTML += `
+                            <div class="success">
+                                <p>✅ ${category}: Shows proper skill recommendations</p>
+                                <p>Priority Skills: ${prioritySkills.length} (${prioritySkills.join(', ')})</p>
+                                <p>Skill Recommendations: ${skillRecommendations.length}</p>
+                            </div>
+                        `;
+                        successCount++;
+                        results[category] = { 
+                            status: 'success', 
+                            priority_skills: prioritySkills.length,
+                            recommendations: skillRecommendations.length,
+                            skills: prioritySkills
+                        };
+                    }
+                    
+                } catch (error) {
+                    categoryDiv.innerHTML += `
+                        <div class="error">
+                            <p>❌ ${category}: API Error - ${error.message}</p>
+                        </div>
+                    `;
+                    errorCount++;
+                    results[category] = { status: 'error', reason: 'api_error', error: error.message };
+                }
+            }
+            
+            // Show summary
+            summaryDiv.style.display = 'block';
+            summaryContent.innerHTML = `
+                <h4>📊 Test Results Summary</h4>
+                <p><strong>Total Categories Tested:</strong> ${ALL_CATEGORIES.length}</p>
+                <p><strong>✅ Successful:</strong> ${successCount}</p>
+                <p><strong>❌ Failed:</strong> ${errorCount}</p>
+                <p><strong>Success Rate:</strong> ${Math.round((successCount / ALL_CATEGORIES.length) * 100)}%</p>
+                
+                <h5>✅ Working Categories:</h5>
+                <ul>
+                    ${Object.entries(results).filter(([cat, res]) => res.status === 'success').map(([cat, res]) => 
+                        `<li>${cat}: ${res.priority_skills} skills, ${res.recommendations} recommendations</li>`
+                    ).join('')}
+                </ul>
+                
+                ${errorCount > 0 ? `
+                    <h5>❌ Problem Categories:</h5>
+                    <ul>
+                        ${Object.entries(results).filter(([cat, res]) => res.status === 'error').map(([cat, res]) => 
+                            `<li>${cat}: ${res.reason}${res.error ? ` - ${res.error}` : ''}</li>`
+                        ).join('')}
+                    </ul>
+                ` : ''}
+                
+                <div class="${errorCount === 0 ? 'success' : 'warning'}">
+                    <h5>${errorCount === 0 ? '🎉 ALL CATEGORIES WORKING!' : '⚠️ Some categories need attention'}</h5>
+                    <p>${errorCount === 0 ? 
+                        'All job categories are working correctly and show proper skill recommendations instead of continuous improvement.' :
+                        `${errorCount} categories are not working correctly and need to be fixed.`
+                    }</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

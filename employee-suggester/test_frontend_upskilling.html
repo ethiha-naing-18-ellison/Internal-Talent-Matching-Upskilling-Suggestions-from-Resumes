@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upskilling Display Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f172a; color: #f1f5f9; }
+        .debug { background: #1e293b; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; }
+        .result { background: #1e293b; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+    <h1>Upskilling Display Test</h1>
+    
+    <div class="debug">
+        <h3>Test Data (NLP Engineer with 77.1% match)</h3>
+        <pre id="test-data"></pre>
+    </div>
+    
+    <div class="debug">
+        <h3>Debug Output</h3>
+        <div id="debug-output"></div>
+    </div>
+    
+    <div class="result">
+        <h3>Generated Content</h3>
+        <div id="generated-content"></div>
+    </div>
+    
+    <script>
+        // Simulate the upskilling data that should be returned
+        const testUpskillingData = {
+            overall_strategy: {
+                currentScore: 77.1,
+                targetScore: 92.1,
+                improvementNeeded: 15.0,
+                totalSkillsToLearn: 4,
+                estimatedWeeks: 2
+            },
+            target_role: "NLP Engineer",
+            priority_skills: ["natural language processing", "tensorflow", "pytorch", "machine learning"],
+            skill_recommendations: [
+                {
+                    skill: "natural language processing",
+                    type: "Technical Skill",
+                    difficulty: "Intermediate",
+                    timeToLearn: "4-6 weeks",
+                    isPriorityForRole: true,
+                    resources: [
+                        {
+                            name: "Natural Language Processing Course",
+                            type: "Course",
+                            platform: "Udemy/Coursera",
+                            hours: 40,
+                            description: "Comprehensive course covering NLP fundamentals and practical applications."
+                        }
+                    ],
+                    projects: [
+                        {
+                            name: "Natural Language Processing Project",
+                            type: "Portfolio",
+                            difficulty: "Intermediate",
+                            hours: 20,
+                            description: "Build a practical project using NLP to demonstrate your skills."
+                        }
+                    ],
+                    roleRelevance: "High Priority"
+                },
+                {
+                    skill: "tensorflow",
+                    type: "Technical Skill",
+                    difficulty: "Intermediate",
+                    timeToLearn: "4-6 weeks",
+                    isPriorityForRole: true,
+                    resources: [
+                        {
+                            name: "TensorFlow Course",
+                            type: "Course",
+                            platform: "Udemy/Coursera",
+                            hours: 40,
+                            description: "Comprehensive course covering TensorFlow fundamentals and practical applications."
+                        }
+                    ],
+                    projects: [
+                        {
+                            name: "TensorFlow Project",
+                            type: "Portfolio",
+                            difficulty: "Intermediate",
+                            hours: 20,
+                            description: "Build a practical project using TensorFlow to demonstrate your skills."
+                        }
+                    ],
+                    roleRelevance: "High Priority"
+                },
+                {
+                    skill: "pytorch",
+                    type: "Technical Skill",
+                    difficulty: "Intermediate",
+                    timeToLearn: "4-6 weeks",
+                    isPriorityForRole: true,
+                    resources: [
+                        {
+                            name: "PyTorch Course",
+                            type: "Course",
+                            platform: "Udemy/Coursera",
+                            hours: 40,
+                            description: "Comprehensive course covering PyTorch fundamentals and practical applications."
+                        }
+                    ],
+                    projects: [
+                        {
+                            name: "PyTorch Project",
+                            type: "Portfolio",
+                            difficulty: "Intermediate",
+                            hours: 20,
+                            description: "Build a practical project using PyTorch to demonstrate your skills."
+                        }
+                    ],
+                    roleRelevance: "High Priority"
+                },
+                {
+                    skill: "machine learning",
+                    type: "Technical Skill",
+                    difficulty: "Intermediate",
+                    timeToLearn: "4-6 weeks",
+                    isPriorityForRole: true,
+                    resources: [
+                        {
+                            name: "Machine Learning Course",
+                            type: "Course",
+                            platform: "Udemy/Coursera",
+                            hours: 40,
+                            description: "Comprehensive course covering machine learning fundamentals and practical applications."
+                        }
+                    ],
+                    projects: [
+                        {
+                            name: "Machine Learning Project",
+                            type: "Portfolio",
+                            difficulty: "Intermediate",
+                            hours: 20,
+                            description: "Build a practical project using machine learning to demonstrate your skills."
+                        }
+                    ],
+                    roleRelevance: "High Priority"
+                }
+            ]
+        };
+        
+        // Display test data
+        document.getElementById('test-data').textContent = JSON.stringify(testUpskillingData, null, 2);
+        
+        // Simulate the generateEnhancedUpskillingContent function
+        function generateEnhancedUpskillingContent(upskillingData) {
+            const { overall_strategy, target_role, skill_recommendations, priority_skills } = upskillingData;
+            
+            console.log('🔍 Debug: generateEnhancedUpskillingContent called with:', upskillingData);
+            console.log('🔍 Debug: skill_recommendations:', skill_recommendations);
+            console.log('🔍 Debug: priority_skills:', priority_skills);
+            
+            // Generate overall strategy section
+            const overallStrategy = `
+                <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h3>🎯 Overall Improvement Strategy</h3>
+                    <p>Current Score: ${overall_strategy.currentScore}%</p>
+                    <p>Target Score: ${overall_strategy.targetScore}%</p>
+                    <p>Target Role: ${target_role}</p>
+                    <p>Priority Skills: ${priority_skills.length}</p>
+                </div>
+            `;
+            
+            // Generate summary card with all skills, courses, and projects
+            const allSkills = skill_recommendations.map(r => r.skill.charAt(0).toUpperCase() + r.skill.slice(1));
+            const allCourses = skill_recommendations.flatMap(r => r.resources);
+            const allProjects = skill_recommendations.flatMap(r => r.projects);
+            
+            console.log('🔍 Debug: allSkills:', allSkills);
+            console.log('🔍 Debug: allSkills.length:', allSkills.length);
+            
+            // If no skills are recommended, show a message about continuous improvement
+            if (allSkills.length === 0) {
+                console.log('🔍 Debug: Showing continuous improvement because allSkills.length is 0');
+                return overallStrategy + `
+                    <div style="background: #1e293b; padding: 15px; border-radius: 8px;">
+                        <h3>🎯 Continuous Improvement Strategy</h3>
+                        <p>Great Job! 🎉 Your current skills are well-aligned with the target role.</p>
+                    </div>
+                `;
+            }
+            
+            // Show the actual skill recommendations
+            console.log('🔍 Debug: Showing skill recommendations because allSkills.length > 0');
+            return overallStrategy + `
+                <div style="background: #1e293b; padding: 15px; border-radius: 8px;">
+                    <h3>📋 Complete Learning Roadmap</h3>
+                    <h4>Skills to Master:</h4>
+                    <ul>
+                        ${allSkills.map(skill => `<li>${skill}</li>`).join('')}
+                    </ul>
+                    <p>Total Skills: ${allSkills.length}</p>
+                    <p>Total Courses: ${allCourses.length}</p>
+                    <p>Total Projects: ${allProjects.length}</p>
+                </div>
+            `;
+        }
+        
+        // Test the function
+        const debugOutput = document.getElementById('debug-output');
+        const generatedContent = document.getElementById('generated-content');
+        
+        debugOutput.innerHTML = '<p>Testing generateEnhancedUpskillingContent function...</p>';
+        
+        try {
+            const result = generateEnhancedUpskillingContent(testUpskillingData);
+            generatedContent.innerHTML = result;
+            debugOutput.innerHTML += '<p style="color: green;">✅ Function executed successfully!</p>';
+        } catch (error) {
+            debugOutput.innerHTML += `<p style="color: red;">❌ Error: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

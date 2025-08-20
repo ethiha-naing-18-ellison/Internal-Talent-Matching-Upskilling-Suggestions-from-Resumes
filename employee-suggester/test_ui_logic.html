@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Logic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .table th { background-color: #f2f2f2; }
+        .skill-tag { 
+            display: inline-block; 
+            padding: 2px 8px; 
+            margin: 2px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            font-weight: 500; 
+        }
+        .skill-matched { background: #d6f5d6; color: #22543d; }
+        .skill-missing { background: #fed7d7; color: #c53030; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>UI Logic Test - Missing Skills Extraction</h1>
+    
+    <h2>Test Table (Simulating the results table)</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Match Score</th>
+                <th>Your Skills</th>
+                <th>Skills to Learn</th>
+            </tr>
+        </thead>
+        <tbody id="results-body">
+            <tr>
+                <td>
+                    <div class="role-title">Software Engineer</div>
+                    <div class="role-id">job_001</div>
+                </td>
+                <td>
+                    <div class="score">78.1%</div>
+                </td>
+                <td>
+                    <div class="skills">
+                        <span class="skill-tag skill-matched">python</span>
+                        <span class="skill-tag skill-matched">sql</span>
+                        <span class="skill-tag skill-matched">react</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="skills">
+                        <span class="skill-tag skill-missing">aws</span>
+                        <span class="skill-tag skill-missing">kubernetes</span>
+                        <span class="skill-tag skill-missing">microservices</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="role-title">Data Scientist</div>
+                    <div class="role-id">job_002</div>
+                </td>
+                <td>
+                    <div class="score">65.0%</div>
+                </td>
+                <td>
+                    <div class="skills">
+                        <span class="skill-tag skill-matched">python</span>
+                        <span class="skill-tag skill-matched">sql</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="skills">
+                        <span class="skill-tag skill-missing">machine learning</span>
+                        <span class="skill-tag skill-missing">statistics</span>
+                        <span class="skill-tag skill-missing">spark</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="role-title">DevOps Engineer</div>
+                    <div class="role-id">job_003</div>
+                </td>
+                <td>
+                    <div class="score">45.0%</div>
+                </td>
+                <td>
+                    <div class="skills">
+                        <span class="skill-tag skill-matched">docker</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="skills">
+                        <span class="skill-tag skill-missing">kubernetes</span>
+                        <span class="skill-tag skill-missing">terraform</span>
+                        <span class="skill-tag skill-missing">jenkins</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <button onclick="testMissingSkillsExtraction()">Test Missing Skills Extraction</button>
+    
+    <div id="debug-output" class="debug"></div>
+    
+    <script>
+        function testMissingSkillsExtraction() {
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.innerHTML = '<h3>Debug Output:</h3>';
+            
+            // Get missing skills from the results table (same logic as the real UI)
+            const resultsBody = document.getElementById('results-body');
+            const rows = resultsBody.querySelectorAll('tr');
+            
+            console.log('🔍 Debug: Found', rows.length, 'rows in results table');
+            debugOutput.innerHTML += `<p>🔍 Debug: Found ${rows.length} rows in results table</p>`;
+            
+            if (!rows || rows.length === 0) {
+                debugOutput.innerHTML += '<p>❌ No rows found in table</p>';
+                return;
+            }
+
+            // Collect all missing skills and job matches data
+            const allMissingSkills = new Set();
+            const jobMatches = [];
+            const resumeSkills = new Set();
+            
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                console.log(`🔍 Debug: Row ${index} has ${cells.length} cells`);
+                debugOutput.innerHTML += `<p>🔍 Debug: Row ${index} has ${cells.length} cells</p>`;
+                
+                if (cells.length >= 4) {
+                    const roleTitle = cells[0].querySelector('.role-title')?.textContent || 'Unknown Role';
+                    const scoreText = cells[1].querySelector('.score')?.textContent || '0%';
+                    const score = parseFloat(scoreText.replace('%', '')) / 100;
+                    const matchedSkills = Array.from(cells[2].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                    const missingSkills = Array.from(cells[3].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                    
+                    console.log(`🔍 Debug: Row ${index} - Role: ${roleTitle}, Score: ${score}, Matched: ${matchedSkills.length}, Missing: ${missingSkills.length}`);
+                    console.log(`🔍 Debug: Missing skills:`, missingSkills);
+                    
+                    debugOutput.innerHTML += `
+                        <p>🔍 Debug: Row ${index} - Role: ${roleTitle}, Score: ${score}, Matched: ${matchedSkills.length}, Missing: ${missingSkills.length}</p>
+                        <p>🔍 Debug: Missing skills: ${missingSkills.join(', ')}</p>
+                    `;
+                    
+                    // Add to resume skills
+                    matchedSkills.forEach(skill => resumeSkills.add(skill.toLowerCase()));
+                    
+                    // Add to missing skills
+                    missingSkills.forEach(skill => allMissingSkills.add(skill));
+                    
+                    // Add to job matches
+                    jobMatches.push({
+                        title: roleTitle,
+                        score: score,
+                        missing_skills: missingSkills
+                    });
+                }
+            });
+
+            console.log('🔍 Debug: Total missing skills collected:', Array.from(allMissingSkills));
+            console.log('🔍 Debug: Job matches:', jobMatches);
+            
+            debugOutput.innerHTML += `
+                <p>🔍 Debug: Total missing skills collected: ${Array.from(allMissingSkills).join(', ')}</p>
+                <p>🔍 Debug: Total missing skills count: ${allMissingSkills.size}</p>
+                <p>🔍 Debug: Job matches count: ${jobMatches.length}</p>
+            `;
+            
+            // Test the upskilling logic
+            if (allMissingSkills.size > 0) {
+                debugOutput.innerHTML += `<p>✅ Successfully extracted ${allMissingSkills.size} missing skills!</p>`;
+                debugOutput.innerHTML += `<p>Missing skills: ${Array.from(allMissingSkills).join(', ')}</p>`;
+            } else {
+                debugOutput.innerHTML += `<p>❌ No missing skills extracted - this is the problem!</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

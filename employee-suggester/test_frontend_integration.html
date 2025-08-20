@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f172a; color: #f1f5f9; }
+        .test { background: #1e293b; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; }
+        .success { border-color: #10b981; }
+        .error { border-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>Frontend Integration Test</h1>
+    
+    <div class="test">
+        <h3>Test: Enhanced Upskilling API Call</h3>
+        <button onclick="testEnhancedUpskilling()">Test API Call</button>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        const API = 'http://127.0.0.1:8002';
+        
+        async function testEnhancedUpskilling() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API}/upskill/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume_skills: ["python", "sql", "react", "docker"],
+                        job_matches: [{
+                            title: "NLP Engineer",
+                            score: 0.771,
+                            missing_skills: ["natural language processing", "tensorflow", "pytorch", "machine learning"]
+                        }],
+                        target_role: "NLP Engineer"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ API Call Successful!</h4>
+                        <p><strong>Target Role:</strong> ${result.target_role}</p>
+                        <p><strong>Priority Skills:</strong> ${result.priority_skills ? result.priority_skills.length : 0}</p>
+                        <p><strong>Skill Recommendations:</strong> ${result.skill_recommendations ? result.skill_recommendations.length : 0}</p>
+                        <p><strong>Current Score:</strong> ${result.overall_strategy ? result.overall_strategy.currentScore : 'N/A'}%</p>
+                        <p><strong>Target Score:</strong> ${result.overall_strategy ? result.overall_strategy.targetScore : 'N/A'}%</p>
+                        
+                        ${result.priority_skills && result.priority_skills.length > 0 ? 
+                            `<p><strong>Skills Found:</strong> ${result.priority_skills.join(', ')}</p>` : 
+                            '<p><strong>No skills found</strong></p>'
+                        }
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ API Call Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>This means the backend server is not running or not accessible.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

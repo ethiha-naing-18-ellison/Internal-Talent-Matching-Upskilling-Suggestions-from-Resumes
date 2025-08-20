@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Quality Engineer Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f172a; color: #f1f5f9; }
+        .test { background: #1e293b; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; }
+        .success { border-color: #10b981; }
+        .error { border-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Data Quality Engineer Debug Test</h1>
+    
+    <div class="test">
+        <h3>Test: Data Quality Engineer with 77.1% match</h3>
+        <button onclick="testDataQualityEngineer()">Test Data Quality Engineer</button>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        const API = 'http://127.0.0.1:8002';
+        
+        async function testDataQualityEngineer() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing Data Quality Engineer...</p>';
+            
+            try {
+                const response = await fetch(`${API}/upskill/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume_skills: ["python", "sql", "react", "docker"],
+                        job_matches: [{
+                            title: "Data Quality Engineer",
+                            score: 0.771,
+                            missing_skills: ["data quality", "testing", "validation", "monitoring"]
+                        }],
+                        target_role: "Data Quality Engineer"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // Debug the data
+                const prioritySkills = result.priority_skills || [];
+                const skillRecommendations = result.skill_recommendations || [];
+                
+                // Calculate allSkills like the frontend does
+                const allSkills = skillRecommendations ? skillRecommendations.map(r => r.skill.charAt(0).toUpperCase() + r.skill.slice(1)) : [];
+                const allCourses = skillRecommendations ? skillRecommendations.flatMap(r => r.resources || []) : [];
+                const allProjects = skillRecommendations ? skillRecommendations.flatMap(r => r.projects || []) : [];
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ API Call Successful!</h4>
+                        <p><strong>Target Role:</strong> ${result.target_role}</p>
+                        <p><strong>Priority Skills:</strong> ${prioritySkills.length} (${prioritySkills.join(', ')})</p>
+                        <p><strong>Skill Recommendations:</strong> ${skillRecommendations.length}</p>
+                        <p><strong>Current Score:</strong> ${result.overall_strategy ? result.overall_strategy.currentScore : 'N/A'}%</p>
+                        <p><strong>Target Score:</strong> ${result.overall_strategy ? result.overall_strategy.targetScore : 'N/A'}%</p>
+                        
+                        <h5>🔍 Frontend Calculation Debug:</h5>
+                        <p><strong>allSkills.length:</strong> ${allSkills.length}</p>
+                        <p><strong>allSkills:</strong> ${allSkills.join(', ')}</p>
+                        <p><strong>allCourses.length:</strong> ${allCourses.length}</p>
+                        <p><strong>allProjects.length:</strong> ${allProjects.length}</p>
+                        
+                        <h5>🎯 Expected Behavior:</h5>
+                        <p><strong>Should show continuous improvement?</strong> ${allSkills.length === 0 ? 'YES (WRONG!)' : 'NO (CORRECT!)'}</p>
+                        <p><strong>Should show skill recommendations?</strong> ${allSkills.length > 0 ? 'YES (CORRECT!)' : 'NO (WRONG!)'}</p>
+                        
+                        ${allSkills.length > 0 ? 
+                            `<div style="background: #10b981; color: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                                <strong>✅ SUCCESS:</strong> Should show skill recommendations, NOT continuous improvement!
+                            </div>` : 
+                            `<div style="background: #ef4444; color: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                                <strong>❌ PROBLEM:</strong> Would show continuous improvement (wrong for 77.1% match)!
+                            </div>`
+                        }
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ API Call Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

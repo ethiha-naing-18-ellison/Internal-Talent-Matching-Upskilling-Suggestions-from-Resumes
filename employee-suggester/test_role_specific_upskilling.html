@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role-Specific Upskilling Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f172a; color: #f1f5f9; }
+        .test { background: #1e293b; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; }
+        .success { border-color: #10b981; }
+        .error { border-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Role-Specific Upskilling Test</h1>
+    
+    <div class="test">
+        <h3>Test: Generate Upskilling Plan for Selected Role</h3>
+        <p>This simulates the "Generate Upskilling Plan" button functionality</p>
+        <button onclick="testRoleSpecificUpskilling()">Test Role-Specific Upskilling</button>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        const API = 'http://127.0.0.1:8002';
+        
+        async function testRoleSpecificUpskilling() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing role-specific upskilling...</p>';
+            
+            try {
+                // Simulate the role-specific upskilling call
+                const selectedRole = "Data Quality Engineer";
+                const resumeSkills = ["python", "sql", "react", "docker"];
+                
+                console.log(`🎯 Testing role-specific upskilling for: ${selectedRole}`);
+                console.log('🔍 Resume skills:', resumeSkills);
+                
+                const response = await fetch(`${API}/upskill/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume_skills: resumeSkills,
+                        job_matches: [{
+                            title: selectedRole,
+                            score: 0.771,
+                            missing_skills: ["data quality", "testing", "validation", "monitoring"]
+                        }],
+                        target_role: selectedRole
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // Check if we got meaningful data
+                const prioritySkills = result.priority_skills || [];
+                const skillRecommendations = result.skill_recommendations || [];
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Role-Specific Upskilling Test Successful!</h4>
+                        <p><strong>Selected Role:</strong> ${selectedRole}</p>
+                        <p><strong>Resume Skills:</strong> ${resumeSkills.join(', ')}</p>
+                        <p><strong>Priority Skills:</strong> ${prioritySkills.length} (${prioritySkills.join(', ')})</p>
+                        <p><strong>Skill Recommendations:</strong> ${skillRecommendations.length}</p>
+                        <p><strong>Current Score:</strong> ${result.overall_strategy ? result.overall_strategy.currentScore : 'N/A'}%</p>
+                        <p><strong>Target Score:</strong> ${result.overall_strategy ? result.overall_strategy.targetScore : 'N/A'}%</p>
+                        
+                        <h5>🎯 Expected Behavior:</h5>
+                        <p><strong>Should show skill recommendations?</strong> ${skillRecommendations.length > 0 ? 'YES ✅' : 'NO ❌'}</p>
+                        <p><strong>Should NOT show continuous improvement?</strong> ${skillRecommendations.length > 0 ? 'YES ✅' : 'NO ❌'}</p>
+                        
+                        ${skillRecommendations.length > 0 ? 
+                            `<div style="background: #10b981; color: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                                <strong>✅ SUCCESS:</strong> Role-specific upskilling is working correctly!
+                                <br>Should show actual skill recommendations instead of continuous improvement.
+                            </div>` : 
+                            `<div style="background: #ef4444; color: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                                <strong>❌ PROBLEM:</strong> No skill recommendations generated!
+                                <br>This would show continuous improvement (wrong for 77.1% match).
+                            </div>`
+                        }
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Role-Specific Upskilling Test Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>This means the "Generate Upskilling Plan" button won't work properly.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

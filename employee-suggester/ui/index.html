@@ -1089,6 +1089,48 @@
                 
                 <!-- Upskilling Tab -->
                 <div id="upskill-tab" class="tab-content" style="display: none;">
+                    <!-- Role Selection Section -->
+                    <div id="role-selection-section" style="display: none; margin-bottom: 2rem;">
+                        <div class="card" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.1)); border: 1px solid var(--primary);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #0284c7); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-bullseye" style="color: white; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">Target Role Selection</h3>
+                                    <p style="margin: 0.25rem 0 0 0; color: var(--text-light); font-size: 0.875rem;">Choose your target role for personalized upskilling recommendations</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <label for="target-role-select" style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 500;">Select Target Role:</label>
+                                    <select id="target-role-select" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font-size: 0.875rem;">
+                                        <option value="">Loading roles...</option>
+                                    </select>
+                                </div>
+                                <button id="generate-upskilling-btn" onclick="generateUpskillingForSelectedRole()" style="padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
+                                    <i class="fas fa-rocket"></i>
+                                    Generate Upskilling Plan
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg); border-radius: var(--radius); border-left: 4px solid var(--primary);">
+                                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                                    <i class="fas fa-info-circle" style="color: var(--primary); margin-top: 0.125rem;"></i>
+                                    <div>
+                                        <strong style="color: var(--text);">How it works:</strong>
+                                        <ul style="margin: 0.5rem 0 0 0; padding-left: 1.25rem; color: var(--text-light); font-size: 0.875rem;">
+                                            <li>Select a role from your job matches to get targeted upskilling recommendations</li>
+                                            <li>Get personalized courses, projects, and skills tailored to your chosen role</li>
+                                            <li>Focus on the most important skills for your target career path</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div id="upskill-content"></div>
                 </div>
             </div>
@@ -1893,6 +1935,8 @@
             const resultsBody = document.getElementById('results-body');
             const rows = resultsBody.querySelectorAll('tr');
             
+            console.log('🔍 Debug: Found', rows.length, 'rows in results table');
+            
             if (!rows || rows.length === 0) {
                 document.getElementById('upskill-content').innerHTML = `
                     <div class="card">
@@ -1908,14 +1952,19 @@
             const jobMatches = [];
             const resumeSkills = new Set();
             
-            rows.forEach(row => {
+            rows.forEach((row, index) => {
                 const cells = row.querySelectorAll('td');
+                console.log(`🔍 Debug: Row ${index} has ${cells.length} cells`);
+                
                 if (cells.length >= 4) {
                     const roleTitle = cells[0].querySelector('.role-title')?.textContent || 'Unknown Role';
                     const scoreText = cells[1].querySelector('.score')?.textContent || '0%';
                     const score = parseFloat(scoreText.replace('%', '')) / 100;
                     const matchedSkills = Array.from(cells[2].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
                     const missingSkills = Array.from(cells[3].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                    
+                    console.log(`🔍 Debug: Row ${index} - Role: ${roleTitle}, Score: ${score}, Matched: ${matchedSkills.length}, Missing: ${missingSkills.length}`);
+                    console.log(`🔍 Debug: Missing skills:`, missingSkills);
                     
                     // Add to resume skills
                     matchedSkills.forEach(skill => resumeSkills.add(skill.toLowerCase()));
@@ -1932,11 +1981,54 @@
                 }
             });
 
-            // Always call the backend API for upskilling recommendations, even with perfect matches
-            // This ensures we get personalized recommendations for continuous improvement
+            console.log('🔍 Debug: Total missing skills collected:', Array.from(allMissingSkills));
+            console.log('🔍 Debug: Job matches:', jobMatches);
+            console.log('🔍 Debug: Resume skills collected:', Array.from(resumeSkills));
+
+            // Store resume skills globally for role-specific upskilling
+            window.originalResumeSkills = Array.from(resumeSkills);
+
+            // Populate the role dropdown with job matches
+            populateRoleDropdown(jobMatches);
+
+            // Determine target role (highest scoring job match)
+            let targetRole = 'auto';
+            if (jobMatches.length > 0) {
+                const bestMatch = jobMatches.reduce((best, current) => 
+                    current.score > best.score ? current : best
+                );
+                targetRole = bestMatch.title;
+            }
+            
+            console.log(`🎯 Target role for upskilling: ${targetRole}`);
+
+            // If no missing skills detected, create some default recommendations based on the job matches
+            if (allMissingSkills.size === 0 && jobMatches.length > 0) {
+                console.log('🔍 Debug: No missing skills detected, creating default recommendations');
+                
+                // Get the highest scoring job to determine target role
+                const bestMatch = jobMatches.reduce((best, current) => 
+                    current.score > best.score ? current : best
+                );
+                
+                // Create default missing skills based on common requirements for the role
+                const defaultSkills = getDefaultSkillsForRole(bestMatch.title);
+                
+                // Add default skills to the job matches
+                jobMatches.forEach(match => {
+                    if (match.missing_skills.length === 0) {
+                        match.missing_skills = [...defaultSkills];
+                    }
+                });
+                
+                // Update allMissingSkills set
+                defaultSkills.forEach(skill => allMissingSkills.add(skill));
+                
+                console.log('🔍 Debug: Added default skills:', defaultSkills);
+            }
 
             try {
-                // Call enhanced upskilling API
+                // Call enhanced upskilling API with target role
                 const response = await fetch(`${API}/upskill/enhanced`, {
                     method: 'POST',
                     headers: {
@@ -1944,7 +2036,8 @@
                     },
                     body: JSON.stringify({
                         resume_skills: Array.from(resumeSkills),
-                        job_matches: jobMatches
+                        job_matches: jobMatches,
+                        target_role: targetRole
                     })
                 });
 
@@ -1953,6 +2046,13 @@
                 }
 
                 const upskillingData = await response.json();
+                console.log('🔍 Debug: Backend upskilling response:', upskillingData);
+                console.log('🔍 Debug: Priority skills count:', upskillingData.priority_skills ? upskillingData.priority_skills.length : 0);
+                console.log('🔍 Debug: Skill recommendations count:', upskillingData.skill_recommendations ? upskillingData.skill_recommendations.length : 0);
+                console.log('🔍 Debug: Priority skills:', upskillingData.priority_skills);
+                console.log('🔍 Debug: Skill recommendations:', upskillingData.skill_recommendations);
+                
+                // Always use the backend response - it should have the correct data
                 const upskillingContent = generateEnhancedUpskillingContent(upskillingData);
                 document.getElementById('upskill-content').innerHTML = upskillingContent;
                 
@@ -1963,10 +2063,47 @@
                 document.getElementById('upskill-content').innerHTML = upskillingContent;
             }
         }
+        
+        // Helper function to get default skills for a role
+        function getDefaultSkillsForRole(roleTitle) {
+            const roleLower = roleTitle.toLowerCase();
+            
+            if (roleLower.includes('data scientist') || roleLower.includes('data science')) {
+                return ['machine learning', 'statistics', 'python', 'sql', 'aws'];
+            } else if (roleLower.includes('nlp engineer') || roleLower.includes('natural language processing')) {
+                return ['natural language processing', 'machine learning', 'python', 'tensorflow', 'pytorch'];
+            } else if (roleLower.includes('machine learning engineer') || roleLower.includes('ml engineer')) {
+                return ['machine learning', 'deep learning', 'python', 'tensorflow', 'aws'];
+            } else if (roleLower.includes('software engineer') || roleLower.includes('developer')) {
+                return ['react', 'docker', 'aws', 'kubernetes', 'microservices'];
+            } else if (roleLower.includes('data engineer')) {
+                return ['apache spark', 'airflow', 'aws', 'docker', 'kubernetes'];
+            } else if (roleLower.includes('devops')) {
+                return ['kubernetes', 'terraform', 'jenkins', 'prometheus', 'ansible'];
+            } else if (roleLower.includes('frontend')) {
+                return ['react', 'typescript', 'vue.js', 'webpack', 'css3'];
+            } else if (roleLower.includes('backend')) {
+                return ['node.js', 'python', 'java', 'docker', 'postgresql'];
+            } else if (roleLower.includes('full stack')) {
+                return ['react', 'node.js', 'docker', 'aws', 'postgresql'];
+            } else if (roleLower.includes('cloud engineer')) {
+                return ['aws', 'azure', 'gcp', 'docker', 'kubernetes'];
+            } else if (roleLower.includes('ai engineer') || roleLower.includes('artificial intelligence')) {
+                return ['machine learning', 'deep learning', 'python', 'tensorflow', 'pytorch'];
+            } else {
+                // Default skills for any role
+                return ['python', 'sql', 'docker', 'aws', 'git'];
+            }
+        }
 
                  // Generate enhanced upskilling content from backend data
          function generateEnhancedUpskillingContent(upskillingData) {
-             const { overall_strategy, target_role, skill_recommendations, priority_skills } = upskillingData;
+             const { overall_strategy, target_role, skill_recommendations, priority_skills, job_category_info } = upskillingData;
+             
+             console.log('🔍 Debug: generateEnhancedUpskillingContent called with:', upskillingData);
+             console.log('🔍 Debug: skill_recommendations:', skill_recommendations);
+             console.log('🔍 Debug: priority_skills:', priority_skills);
+             console.log('🔍 Debug: job_category_info:', job_category_info);
              
              // Generate overall strategy section
              const overallStrategy = `
@@ -1979,7 +2116,7 @@
                                  <div style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">Highest Match Score</div>
                                  <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${overall_strategy.currentScore}%</div>
                                  <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.25rem;">
-                                     ${priority_skills.length} skills to improve
+                                     ${priority_skills.length > 0 ? priority_skills.length + ' skills to improve' : 'Skills well-aligned'}
                                  </div>
                              </div>
                          </div>
@@ -1998,17 +2135,188 @@
                          <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">🎯 Target Role: ${target_role}</h4>
                          <div style="color: var(--text-gray); line-height: 1.6;">
                              <p style="margin-bottom: 0.5rem;">Focus on developing skills for <strong>${target_role}</strong> role</p>
-                             <p style="font-size: 0.875rem; color: var(--muted);">Based on your resume analysis and job matches.</p>
+                             ${job_category_info && job_category_info.description ? 
+                                 `<p style="font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem;">${job_category_info.description}</p>` : 
+                                 '<p style="font-size: 0.875rem; color: var(--muted);">Based on your resume analysis and job matches.</p>'
+                             }
+                             ${job_category_info && job_category_info.prioritySkills ? 
+                                 `<p style="font-size: 0.875rem; color: var(--primary);">Key skills for this role: ${job_category_info.prioritySkills.slice(0, 3).join(', ')}${job_category_info.prioritySkills.length > 3 ? '...' : ''}</p>` : 
+                                 ''
+                             }
                          </div>
                      </div>
                      <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius);">
                          <h4 style="color: var(--text-dark); margin-bottom: 0.5rem; font-size: 1rem;">📈 Action Plan</h4>
                          <ul style="color: var(--text-gray); line-height: 1.6; padding-left: 1.5rem;">
-                             <li>Focus on <strong>${overall_strategy.totalSkillsToLearn}</strong> priority skills identified</li>
+                             <li>Focus on <strong>${overall_strategy.totalSkillsToLearn > 0 ? overall_strategy.totalSkillsToLearn : 'continuous improvement'}</strong> ${overall_strategy.totalSkillsToLearn > 0 ? 'priority skills identified' : 'areas'}</li>
                              <li>Complete recommended courses and projects for each skill</li>
                              <li>Build portfolio projects to demonstrate practical expertise</li>
                              <li>Target completion: <strong>${overall_strategy.estimatedWeeks} weeks</strong></li>
                          </ul>
+                     </div>
+                 </div>
+             `;
+             
+                              // Generate summary card with all skills, courses, and projects
+             const allSkills = skill_recommendations ? skill_recommendations.map(r => r.skill.charAt(0).toUpperCase() + r.skill.slice(1)) : [];
+             const allCourses = skill_recommendations ? skill_recommendations.flatMap(r => r.resources || []) : [];
+             const allProjects = skill_recommendations ? skill_recommendations.flatMap(r => r.projects || []) : [];
+             
+             console.log('🔍 Debug: allSkills:', allSkills);
+             console.log('🔍 Debug: allSkills.length:', allSkills.length);
+             console.log('🔍 Debug: skill_recommendations type:', typeof skill_recommendations);
+             console.log('🔍 Debug: skill_recommendations:', skill_recommendations);
+             
+             // If no skills are recommended, show a message about continuous improvement
+             if (allSkills.length === 0) {
+                 console.log('🔍 Debug: Showing continuous improvement because allSkills.length is 0');
+                 
+                 // Add role-specific certifications and projects if available
+                 let roleSpecificContent = '';
+                 if (job_category_info) {
+                     const certifications = job_category_info.certifications || [];
+                     const projects = job_category_info.projects || [];
+                     
+                     if (certifications.length > 0 || projects.length > 0) {
+                         roleSpecificContent = `
+                             <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.1)); border: 1px solid #10b981;">
+                                 <h3 style="color: var(--text-dark); margin-bottom: 1.5rem;">🎯 Role-Specific Recommendations</h3>
+                                 
+                                 ${certifications.length > 0 ? `
+                                     <div style="background: var(--bg); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1rem;">
+                                         <h4 style="color: var(--text-dark); margin-bottom: 1rem;">🏆 Recommended Certifications</h4>
+                                         <div style="display: grid; gap: 1rem;">
+                                             ${certifications.map(cert => `
+                                                 <div style="padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius);">
+                                                     <div style="font-weight: 600; color: var(--text-dark);">${cert.name}</div>
+                                                     <div style="font-size: 0.875rem; color: var(--muted);">${cert.platform}</div>
+                                                     <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.5rem;">${cert.description}</div>
+                                                 </div>
+                                             `).join('')}
+                                         </div>
+                                     </div>
+                                 ` : ''}
+                                 
+                                 ${projects.length > 0 ? `
+                                     <div style="background: var(--bg); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1rem;">
+                                         <h4 style="color: var(--text-dark); margin-bottom: 1rem;">🚀 Portfolio Projects</h4>
+                                         <div style="display: grid; gap: 1rem;">
+                                             ${projects.map(project => `
+                                                 <div style="padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius);">
+                                                     <div style="font-weight: 600; color: var(--text-dark);">${project.name}</div>
+                                                     <div style="font-size: 0.875rem; color: var(--muted);">Difficulty: ${project.difficulty}</div>
+                                                     <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.5rem;">${project.description}</div>
+                                                 </div>
+                                             `).join('')}
+                                         </div>
+                                     </div>
+                                 ` : ''}
+                             </div>
+                         `;
+                     }
+                 }
+                 
+                 const continuousImprovementCard = `
+                     <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid var(--primary);">
+                         <h3 style="color: var(--text-dark); margin-bottom: 1.5rem;">🎯 Continuous Improvement Strategy</h3>
+                         
+                         <div style="background: var(--bg); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+                             <h4 style="color: var(--text-dark); margin-bottom: 1rem;">Great Job! 🎉</h4>
+                             <p style="color: var(--text-gray); line-height: 1.6; margin-bottom: 1rem;">
+                                 Your current skills are well-aligned with the target role. However, continuous learning is key to staying competitive in the tech industry.
+                             </p>
+                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+                                 <div style="text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius);">
+                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                                     <div style="font-weight: 600; color: var(--text-dark);">Advanced Courses</div>
+                                     <div style="font-size: 0.875rem; color: var(--muted);">Take your skills to the next level</div>
+                                 </div>
+                                 <div style="text-align: center; padding: 1rem; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius);">
+                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
+                                     <div style="font-weight: 600; color: var(--text-dark);">Portfolio Projects</div>
+                                     <div style="font-size: 0.875rem; color: var(--muted);">Build impressive projects</div>
+                                 </div>
+                                 <div style="text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: var(--radius);">
+                                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏆</div>
+                                     <div style="font-weight: 600; color: var(--text-dark);">Certifications</div>
+                                     <div style="font-size: 0.875rem; color: var(--muted);">Validate your expertise</div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 `;
+                 return overallStrategy + roleSpecificContent + continuousImprovementCard;
+             }
+             
+             const summaryCard = `
+                 <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid var(--primary);">
+                     <h3 style="color: var(--text-dark); margin-bottom: 1.5rem;">📋 Complete Learning Roadmap</h3>
+                     
+                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                         <div style="background: var(--bg); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid #ef4444;">
+                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                                 <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                                     <i class="fas fa-code"></i>
+                                 </div>
+                                 <h4 style="color: var(--text-dark); margin: 0;">Skills to Master</h4>
+                             </div>
+                             <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                 ${allSkills.map(skill => `
+                                     <span style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                         ${skill}
+                                     </span>
+                                 `).join('')}
+                             </div>
+                             <p style="font-size: 0.875rem; color: var(--text-gray); margin-top: 1rem; line-height: 1.5;">
+                                 ${allSkills.length > 0 ? 
+                                     `Focus on these ${allSkills.length} priority skills to improve your job match score from ${overall_strategy.currentScore}% to ${overall_strategy.targetScore}%.` :
+                                     `Your skills are well-aligned! Focus on continuous improvement to maintain your competitive edge.`
+                                 }
+                             </p>
+                         </div>
+                         
+                         <div style="background: var(--bg); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid #10b981;">
+                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                                 <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                                     <i class="fas fa-graduation-cap"></i>
+                                 </div>
+                                 <h4 style="color: var(--text-dark); margin: 0;">Recommended Courses</h4>
+                             </div>
+                             <div style="max-height: 200px; overflow-y: auto;">
+                                 ${allCourses.slice(0, 5).map(course => `
+                                     <div style="padding: 0.75rem; background: rgba(16, 185, 129, 0.05); border-radius: var(--radius); margin-bottom: 0.5rem; border-left: 3px solid #10b981;">
+                                         <div style="font-weight: 600; color: var(--text-dark); font-size: 0.875rem; margin-bottom: 0.25rem;">${course.name}</div>
+                                         <div style="font-size: 0.75rem; color: var(--muted);">${course.platform} • ${course.hours} hours</div>
+                                     </div>
+                                 `).join('')}
+                                 ${allCourses.length > 5 ? `<div style="text-align: center; color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem;">+${allCourses.length - 5} more courses</div>` : ''}
+                             </div>
+                         </div>
+                         
+                         <div style="background: var(--bg); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid #f59e0b;">
+                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                                 <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                                     <i class="fas fa-project-diagram"></i>
+                                 </div>
+                                 <h4 style="color: var(--text-dark); margin: 0;">Project Ideas</h4>
+                             </div>
+                             <div style="max-height: 200px; overflow-y: auto;">
+                                 ${allProjects.slice(0, 5).map(project => `
+                                     <div style="padding: 0.75rem; background: rgba(245, 158, 11, 0.05); border-radius: var(--radius); margin-bottom: 0.5rem; border-left: 3px solid #f59e0b;">
+                                         <div style="font-weight: 600; color: var(--text-dark); font-size: 0.875rem; margin-bottom: 0.25rem;">${project.title}</div>
+                                         <div style="font-size: 0.75rem; color: var(--text-gray); line-height: 1.4;">${project.description.substring(0, 80)}${project.description.length > 80 ? '...' : ''}</div>
+                                     </div>
+                                 `).join('')}
+                                 ${allProjects.length > 5 ? `<div style="text-align: center; color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem;">+${allProjects.length - 5} more projects</div>` : ''}
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                         <p style="color: var(--text-gray); margin: 0; font-size: 0.875rem;">
+                             <strong>Total Learning Time:</strong> ~${Math.ceil(allCourses.reduce((sum, course) => sum + (course.hours || 0), 0) / 10)} weeks 
+                             <span style="color: var(--muted);">(assuming 10 hours/week)</span>
+                         </p>
                      </div>
                  </div>
              `;
@@ -2091,7 +2399,7 @@
                  `;
              }).join('');
              
-             return overallStrategy + skillCards;
+             return overallStrategy + summaryCard + skillCards;
          }
 
          // Generate comprehensive upskilling recommendations (fallback)
@@ -2692,6 +3000,228 @@ PROJECTS: Churn analysis, Next.js dashboard, Airflow pipelines`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        // Global variable to store selected role
+        let selectedRole = 'auto';
+
+        // Role selection function
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Update visual selection
+            document.querySelectorAll('.role-option').forEach(option => {
+                option.style.border = '2px solid var(--border)';
+                option.style.background = 'var(--bg-light)';
+                option.style.color = 'var(--text)';
+            });
+            
+            const selectedElement = document.getElementById(`role-${role}`);
+            if (selectedElement) {
+                selectedElement.style.border = '2px solid var(--primary)';
+                selectedElement.style.background = 'var(--primary)';
+                selectedElement.style.color = 'white';
+            }
+            
+            // Show notification
+            const roleName = role === 'auto' ? 'Auto-Detect' : role;
+            showNotification(`Target role set to: ${roleName}`, 'success');
+            
+            console.log(`🎯 Role selected: ${role}`);
+        }
+
+        // Populate role dropdown with job matches
+        function populateRoleDropdown(jobMatches) {
+            const roleSelect = document.getElementById('target-role-select');
+            const roleSelectionSection = document.getElementById('role-selection-section');
+            
+            if (!roleSelect || !roleSelectionSection) {
+                console.warn('Role selection elements not found');
+                return;
+            }
+            
+            // Clear existing options
+            roleSelect.innerHTML = '';
+            
+            if (!jobMatches || jobMatches.length === 0) {
+                roleSelect.innerHTML = '<option value="">No job matches available</option>';
+                roleSelectionSection.style.display = 'none';
+                return;
+            }
+            
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '-- Select a target role --';
+            roleSelect.appendChild(defaultOption);
+            
+            // Add job match roles
+            jobMatches.forEach((match, index) => {
+                const option = document.createElement('option');
+                option.value = match.title;
+                option.textContent = `${match.title} (${(match.score * 100).toFixed(1)}% match)`;
+                roleSelect.appendChild(option);
+            });
+            
+            // Show the role selection section
+            roleSelectionSection.style.display = 'block';
+            
+            console.log(`🎯 Populated role dropdown with ${jobMatches.length} roles`);
+        }
+
+        // Generate upskilling for selected role
+        async function generateUpskillingForSelectedRole() {
+            const roleSelect = document.getElementById('target-role-select');
+            const selectedRole = roleSelect.value;
+            
+            if (!selectedRole) {
+                showNotification('Please select a target role first', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('generate-upskilling-btn');
+            setButtonLoading(button, true);
+            
+            try {
+                console.log(`🎯 Generating upskilling for selected role: ${selectedRole}`);
+                
+                // Get resume skills from the original resume data or table
+                let resumeSkills = getResumeSkillsFromTable();
+                
+                // If no skills found in table, try to get from original resume data
+                if (!resumeSkills || resumeSkills.length === 0) {
+                    console.log('🔍 No skills found in table, trying to get from original resume data...');
+                    resumeSkills = window.originalResumeSkills || ['python', 'sql', 'react', 'docker']; // Fallback
+                }
+                
+                console.log('🔍 Debug: Resume skills for role-specific upskilling:', resumeSkills);
+                
+                // Get default missing skills for the selected role
+                const defaultMissingSkills = getDefaultSkillsForRole(selectedRole);
+                
+                console.log('🔍 Debug: Default missing skills for role:', defaultMissingSkills);
+                
+                // Call the enhanced upskilling API with target role
+                const response = await fetch(`${API}/upskill/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resume_skills: resumeSkills,
+                        job_matches: [{
+                            title: selectedRole,
+                            score: 0.771, // Default score for role-specific upskilling
+                            missing_skills: defaultMissingSkills // Use default skills for the role
+                        }],
+                        target_role: selectedRole
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Enhanced upskilling API failed: ${response.status}`);
+                }
+
+                const upskillingResult = await response.json();
+                console.log('🔍 Debug: Role-specific upskilling result:', upskillingResult);
+                
+                // Check if we got meaningful data
+                const prioritySkills = upskillingResult.priority_skills || [];
+                const skillRecommendations = upskillingResult.skill_recommendations || [];
+                
+                console.log('🔍 Debug: Priority skills count:', prioritySkills.length);
+                console.log('🔍 Debug: Skill recommendations count:', skillRecommendations.length);
+                
+                if (prioritySkills.length === 0 && skillRecommendations.length === 0) {
+                    throw new Error('No upskilling recommendations generated for this role');
+                }
+                
+                // Display the upskilling content
+                const upskillingContent = generateEnhancedUpskillingContent(upskillingResult);
+                document.getElementById('upskill-content').innerHTML = upskillingContent;
+                
+                showNotification(`Upskilling plan generated for ${selectedRole}!`, 'success');
+                
+            } catch (error) {
+                console.error('Error generating upskilling for selected role:', error);
+                showNotification(`Failed to generate upskilling plan: ${error.message}. Please try again.`, 'error');
+            } finally {
+                setButtonLoading(button, false);
+            }
+        }
+
+        // Get job matches from the results table
+        function getJobMatchesFromTable() {
+            const resultsBody = document.getElementById('results-body');
+            const rows = resultsBody.querySelectorAll('tr');
+            const jobMatches = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 4) {
+                    const roleTitle = cells[0].querySelector('.role-title')?.textContent || 'Unknown Role';
+                    const scoreText = cells[1].querySelector('.score')?.textContent || '0%';
+                    const score = parseFloat(scoreText.replace('%', '')) / 100;
+                    const missingSkills = Array.from(cells[3].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                    
+                    jobMatches.push({
+                        title: roleTitle,
+                        score: score,
+                        missing_skills: missingSkills
+                    });
+                }
+            });
+            
+            return jobMatches;
+        }
+
+        // Get resume skills from the results table
+        function getResumeSkillsFromTable() {
+            const resultsBody = document.getElementById('results-body');
+            const rows = resultsBody.querySelectorAll('tr');
+            const resumeSkills = new Set();
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 4) {
+                    const matchedSkills = Array.from(cells[2].querySelectorAll('.skill-tag')).map(tag => tag.textContent);
+                    matchedSkills.forEach(skill => resumeSkills.add(skill.toLowerCase()));
+                }
+            });
+            
+            return Array.from(resumeSkills);
+        }
+
+        // Get role-specific upskilling recommendations
+        async function getRoleSpecificUpskilling(resumeSkills, jobMatches, targetRole) {
+            try {
+                console.log(`🎯 Getting upskilling for role: ${targetRole}`);
+                
+                // Call the enhanced upskilling API with role-specific data
+                const response = await fetch(`${API}/upskill/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        resume_skills: resumeSkills,
+                        job_matches: jobMatches,
+                        target_role: targetRole
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Upskilling API failed: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log(`✅ Role-specific upskilling result:`, result);
+                return result;
+                
+            } catch (error) {
+                console.error('❌ Role-specific upskilling failed:', error);
+                throw error;
+            }
         }
     </script>
 

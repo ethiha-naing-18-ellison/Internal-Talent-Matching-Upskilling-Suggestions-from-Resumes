@@ -100,3 +100,51 @@ async def get_role_details(role_name: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get role details: {str(e)}")
+
+@router.get("/upskill/job-categories")
+async def get_all_job_categories():
+    """
+    Get all available job categories.
+    """
+    try:
+        upskiller = EnhancedUpskiller()
+        categories = upskiller.get_all_job_categories()
+        
+        return {
+            "categories": categories,
+            "count": len(categories)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get job categories: {str(e)}")
+
+@router.post("/upskill/role-specific")
+async def get_role_specific_upskilling(request: dict):
+    """
+    Generate role-specific upskilling plan for a target role.
+    
+    Expected request format:
+    {
+        "target_role": "Data Scientist",
+        "resume_skills": ["python", "sql", "react"]
+    }
+    """
+    increment_metric("role_specific_upskill_calls")
+    
+    try:
+        upskiller = EnhancedUpskiller()
+        
+        target_role = request.get("target_role")
+        resume_skills = request.get("resume_skills", [])
+        
+        if not target_role:
+            raise HTTPException(status_code=400, detail="target_role is required")
+        
+        result = upskiller.get_role_specific_upskilling(target_role, resume_skills)
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate role-specific upskilling: {str(e)}")
