@@ -953,6 +953,180 @@
          .analysis-card summary div:last-child {
              transition: transform 0.3s ease;
          }
+
+         /* Enhanced Resume Analysis Styles */
+         .enhanced-analysis-card {
+             background: linear-gradient(135deg, var(--bg) 0%, var(--bg-light) 100%);
+             border: 1px solid var(--border);
+             border-radius: var(--radius-lg);
+             padding: 1.5rem;
+             margin-bottom: 1.5rem;
+             box-shadow: var(--shadow);
+         }
+
+         .analysis-score-card {
+             text-align: center;
+             padding: 1.5rem;
+             background: var(--bg);
+             border-radius: var(--radius);
+             border: 2px solid var(--primary);
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+         }
+
+         .analysis-score-card:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+         }
+
+         .analysis-score-card.excellent {
+             border-color: var(--success);
+         }
+
+         .analysis-score-card.good {
+             border-color: var(--warning);
+         }
+
+         .analysis-score-card.needs-improvement {
+             border-color: var(--error);
+         }
+
+         .experience-level-card {
+             text-align: center;
+             padding: 1.5rem;
+             background: var(--bg);
+             border-radius: var(--radius);
+             border: 2px solid var(--success);
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+         }
+
+         .experience-level-card:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+         }
+
+         .salary-range-card {
+             padding: 1.5rem;
+             background: var(--bg);
+             border-radius: var(--radius);
+             border-left: 4px solid var(--warning);
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+         }
+
+         .salary-range-card:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+         }
+
+         .skills-gap-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+             gap: 1rem;
+             margin-top: 1rem;
+         }
+
+         .skills-gap-category {
+             padding: 1.5rem;
+             background: var(--bg);
+             border-radius: var(--radius);
+             border-left: 4px solid var(--error);
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+         }
+
+         .skills-gap-category:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+         }
+
+         .skills-gap-category.technical {
+             border-left-color: var(--error);
+         }
+
+         .skills-gap-category.soft {
+             border-left-color: var(--warning);
+         }
+
+         .skills-gap-category.tools {
+             border-left-color: var(--primary);
+         }
+
+         .improvement-suggestions {
+             padding: 1.5rem;
+             background: var(--bg);
+             border-radius: var(--radius);
+             border-left: 4px solid var(--primary);
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+         }
+
+         .improvement-suggestions:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-lg);
+         }
+
+         .improvement-suggestions ul {
+             margin: 0;
+             padding-left: 1.5rem;
+             color: var(--text-dark);
+         }
+
+         .improvement-suggestions li {
+             margin-bottom: 0.75rem;
+             line-height: 1.6;
+         }
+
+         .analysis-icon {
+             margin-right: 0.5rem;
+             font-size: 1.1em;
+         }
+
+         .score-display {
+             font-size: 2.5rem;
+             font-weight: bold;
+             margin-bottom: 0.5rem;
+             background: linear-gradient(135deg, var(--primary), var(--success));
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+         }
+
+         .level-display {
+             font-size: 1.8rem;
+             font-weight: bold;
+             color: var(--success);
+             margin-bottom: 0.5rem;
+         }
+
+         .salary-display {
+             font-size: 1.4rem;
+             font-weight: bold;
+             color: var(--text-dark);
+             margin-bottom: 0.25rem;
+         }
+
+         .salary-subtitle {
+             font-size: 0.9rem;
+             color: var(--muted);
+             font-style: italic;
+         }
+
+         /* Responsive adjustments for enhanced analysis */
+         @media (max-width: 768px) {
+             .skills-gap-grid {
+                 grid-template-columns: 1fr;
+             }
+             
+             .analysis-score-card,
+             .experience-level-card {
+                 padding: 1rem;
+             }
+             
+             .score-display {
+                 font-size: 2rem;
+             }
+             
+             .level-display {
+                 font-size: 1.5rem;
+             }
+         }
      </style>
 </head>
 <body>
@@ -1445,13 +1619,16 @@
                 // Step 1: Parse resume (optional - for profile display)
                 const profile = await parseResumeText(text);
                 
-                // Step 2: Display profile (enhanced matches will be populated from table data)
-                displayProfile(profile.profile);
+                // Step 2: Perform enhanced resume analysis
+                const enhancedAnalysis = await performEnhancedResumeAnalysis(text, profile.profile);
                 
-                // Step 3: Display enhanced matches (will use data from basic results table)
+                // Step 3: Display profile with enhanced analysis
+                displayProfile(profile.profile, enhancedAnalysis);
+                
+                // Step 4: Display enhanced matches (will use data from basic results table)
                 displayMatches([]);
                 
-                // Step 4: Generate upskilling plans from table data
+                // Step 5: Generate upskilling plans from table data
                 try {
                     // Call displayUpskillingPlans without parameters so it reads from the populated table
                     await displayUpskillingPlans();
@@ -1468,6 +1645,153 @@
                 displayMatches([]);
                 displayUpskillingPlans([]);
             }
+        }
+
+        // Enhanced Resume Analysis - Skills Gap, Experience Level, Salary, Resume Score
+        async function performEnhancedResumeAnalysis(text, profile) {
+            const analysis = {
+                skillsGap: {},
+                experienceLevel: 'Mid-Level',
+                salaryRange: null, // Will be null if not found in resume
+                resumeScore: 75,
+                skillMatchPercentages: {},
+                improvementSuggestions: []
+            };
+
+            // Analyze skills and experience level
+            const skills = profile?.skills || [];
+            const experience = profile?.experience || [];
+            const education = profile?.education || [];
+            const projects = profile?.projects || [];
+
+            // Experience Level Detection
+            let totalExperience = 0;
+            if (experience.length > 0) {
+                totalExperience = experience.length * 2; // Rough estimate
+            }
+            
+            if (skills.length > 0) {
+                totalExperience += skills.length * 0.5;
+            }
+            
+            if (projects.length > 0) {
+                totalExperience += projects.length * 1.5;
+            }
+
+            if (totalExperience < 3) {
+                analysis.experienceLevel = 'Junior';
+            } else if (totalExperience < 7) {
+                analysis.experienceLevel = 'Mid-Level';
+            } else {
+                analysis.experienceLevel = 'Senior';
+            }
+
+            // Extract salary range from resume text
+            analysis.salaryRange = extractSalaryFromResume(text);
+
+            // Resume Score Calculation
+            let score = 0;
+            const suggestions = [];
+
+            // Skills diversity (0-25 points)
+            const uniqueSkills = new Set(skills.map(s => s.name || s));
+            score += Math.min(uniqueSkills.size * 2, 25);
+            if (uniqueSkills.size < 5) {
+                suggestions.push('Add more diverse technical skills to your resume');
+            }
+
+            // Experience detail (0-25 points)
+            score += Math.min(experience.length * 5, 25);
+            if (experience.length < 2) {
+                suggestions.push('Include more detailed work experience descriptions');
+            }
+
+            // Project showcase (0-20 points)
+            score += Math.min(projects.length * 4, 20);
+            if (projects.length < 2) {
+                suggestions.push('Add more project examples with measurable outcomes');
+            }
+
+            // Education (0-15 points)
+            score += Math.min(education.length * 3, 15);
+            if (education.length === 0) {
+                suggestions.push('Include your educational background');
+            }
+
+            // Certifications (0-15 points)
+            const certs = profile?.certs || [];
+            score += Math.min(certs.length * 3, 15);
+            if (certs.length === 0) {
+                suggestions.push('Consider adding relevant certifications');
+            }
+
+            analysis.resumeScore = Math.min(score, 100);
+            analysis.improvementSuggestions = suggestions;
+
+            // Skills Gap Analysis (placeholder - will be populated with actual job data)
+            // This will be enhanced when we integrate with actual job matching results
+            analysis.skillsGap = {
+                technical: ['Machine Learning', 'Cloud Computing', 'Data Science'],
+                soft: ['Leadership', 'Project Management', 'Communication'],
+                tools: ['Docker', 'Kubernetes', 'AWS']
+            };
+
+            return analysis;
+        }
+
+        // Extract salary range from resume text
+        function extractSalaryFromResume(text) {
+            if (!text) return null;
+            
+            const lowerText = text.toLowerCase();
+            
+            // Common salary patterns
+            const salaryPatterns = [
+                // $50,000 - $80,000
+                /\$(\d{1,3}(?:,\d{3})*)\s*[-–—]\s*\$(\d{1,3}(?:,\d{3})*)/g,
+                // $50k - $80k
+                /\$(\d{1,3})k\s*[-–—]\s*\$(\d{1,3})k/gi,
+                // 50,000 - 80,000 USD
+                /(\d{1,3}(?:,\d{3})*)\s*[-–—]\s*(\d{1,3}(?:,\d{3})*)\s*(?:usd|dollars?)/gi,
+                // 50k - 80k USD
+                /(\d{1,3})k\s*[-–—]\s*(\d{1,3})k\s*(?:usd|dollars?)/gi,
+                // Salary: $50,000 - $80,000
+                /salary[:\s]*\$(\d{1,3}(?:,\d{3})*)\s*[-–—]\s*\$(\d{1,3}(?:,\d{3})*)/gi,
+                // Expected salary: $50,000 - $80,000
+                /expected\s*salary[:\s]*\$(\d{1,3}(?:,\d{3})*)\s*[-–—]\s*\$(\d{1,3}(?:,\d{3})*)/gi,
+                // Compensation: $50,000 - $80,000
+                /compensation[:\s]*\$(\d{1,3}(?:,\d{3})*)\s*[-–—]\s*\$(\d{1,3}(?:,\d{3})*)/gi
+            ];
+            
+            for (let pattern of salaryPatterns) {
+                const matches = [...text.matchAll(pattern)];
+                if (matches.length > 0) {
+                    const match = matches[0];
+                    let min, max;
+                    
+                    if (pattern.source.includes('k')) {
+                        // Handle k format (e.g., 50k)
+                        min = parseInt(match[1]) * 1000;
+                        max = parseInt(match[2]) * 1000;
+                    } else {
+                        // Handle regular number format
+                        min = parseInt(match[1].replace(/,/g, ''));
+                        max = parseInt(match[2].replace(/,/g, ''));
+                    }
+                    
+                    // Validate reasonable salary range
+                    if (min > 0 && max > 0 && min <= max && max <= 1000000) {
+                        return {
+                            min: min,
+                            max: max,
+                            currency: 'USD',
+                            source: 'resume'
+                        };
+                    }
+                }
+            }
+            
+            return null; // No salary found in resume
         }
 
         // Basic analysis (original functionality)
@@ -1569,7 +1893,7 @@
         }
 
         // Display profile information
-        function displayProfile(profile) {
+        function displayProfile(profile, enhancedAnalysis = null) {
             if (!profile) {
                 document.getElementById('profile-content').innerHTML = `
                     <div class="card">
@@ -1603,6 +1927,108 @@
                         </div>
                     </div>
                 </div>
+
+                ${enhancedAnalysis ? `
+                <!-- Enhanced Resume Analysis Section -->
+                <div class="enhanced-analysis-card">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">
+                        <i class="fas fa-chart-line analysis-icon" style="color: var(--primary);"></i>
+                        Enhanced Resume Analysis
+                    </h3>
+                    
+                    <!-- Resume Score and Experience Level -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="analysis-score-card ${enhancedAnalysis.resumeScore >= 80 ? 'excellent' : enhancedAnalysis.resumeScore >= 60 ? 'good' : 'needs-improvement'}">
+                            <div class="score-display">
+                                ${enhancedAnalysis.resumeScore}/100
+                            </div>
+                            <div style="color: var(--text-dark); font-weight: 600; margin-bottom: 0.5rem;">Resume Score</div>
+                            <div style="font-size: 0.9rem; color: var(--muted);">
+                                ${enhancedAnalysis.resumeScore >= 80 ? 'Excellent' : enhancedAnalysis.resumeScore >= 60 ? 'Good' : 'Needs Improvement'}
+                            </div>
+                        </div>
+                        
+                        <div class="experience-level-card">
+                            <div class="level-display">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div style="color: var(--text-dark); font-weight: 600; margin-bottom: 0.5rem;">Experience Level</div>
+                            <div style="font-size: 1.2rem; color: var(--text-dark);">
+                                ${enhancedAnalysis.experienceLevel}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Salary Range from Resume -->
+                    ${enhancedAnalysis.salaryRange ? `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 1rem;">
+                            <i class="fas fa-dollar-sign analysis-icon" style="color: var(--warning);"></i>
+                            Salary Range from Resume
+                        </h4>
+                        <div class="salary-range-card">
+                            <div class="salary-display">
+                                $${enhancedAnalysis.salaryRange.min.toLocaleString()} - $${enhancedAnalysis.salaryRange.max.toLocaleString()} ${enhancedAnalysis.salaryRange.currency}
+                            </div>
+                            <div class="salary-subtitle">
+                                Extracted from your resume
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Skills Gap Analysis -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 1rem;">
+                            <i class="fas fa-exclamation-triangle analysis-icon" style="color: var(--error);"></i>
+                            Skills Gap Analysis
+                        </h4>
+                        <div class="skills-gap-grid">
+                            <div class="skills-gap-category technical">
+                                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 1rem;">Technical Skills</div>
+                                <div class="skills">
+                                    ${enhancedAnalysis.skillsGap.technical.map(skill => `
+                                        <span class="skill-tag skill-missing">${skill}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="skills-gap-category soft">
+                                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 1rem;">Soft Skills</div>
+                                <div class="skills">
+                                    ${enhancedAnalysis.skillsGap.soft.map(skill => `
+                                        <span class="skill-tag skill-missing">${skill}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="skills-gap-category tools">
+                                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 1rem;">Tools & Platforms</div>
+                                <div class="skills">
+                                    ${enhancedAnalysis.skillsGap.tools.map(skill => `
+                                        <span class="skill-tag skill-missing">${skill}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Improvement Suggestions -->
+                    ${enhancedAnalysis.improvementSuggestions.length > 0 ? `
+                    <div>
+                        <h4 style="color: var(--text-dark); margin-bottom: 1rem;">
+                            <i class="fas fa-lightbulb analysis-icon" style="color: var(--primary);"></i>
+                            Improvement Suggestions
+                        </h4>
+                        <div class="improvement-suggestions">
+                            <ul>
+                                ${enhancedAnalysis.improvementSuggestions.map(suggestion => `
+                                    <li>${suggestion}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
                 
                                  ${(profile.education || []).length > 0 ? `
                      <div class="card" style="margin-bottom: 1rem;">

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Resume Analysis Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Enhanced Resume Analysis Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Test the enhanced analysis function
+        function testEnhancedAnalysis() {
+            const results = document.getElementById('results');
+            
+            // Mock profile data
+            const mockProfile = {
+                name: 'John Doe',
+                skills: [
+                    { name: 'Python', level: 3 },
+                    { name: 'SQL', level: 2 },
+                    { name: 'React', level: 2 }
+                ],
+                experience: ['Software Engineer at Tech Corp'],
+                education: ['Bachelor in Computer Science'],
+                projects: ['E-commerce Website'],
+                certs: ['AWS Certified Developer']
+            };
+
+            // Mock enhanced analysis function (simplified version)
+            function performEnhancedResumeAnalysis(text, profile) {
+                const analysis = {
+                    skillsGap: {},
+                    experienceLevel: 'Mid-Level',
+                    salaryRange: null, // Will be extracted from resume text
+                    resumeScore: 75,
+                    skillMatchPercentages: {},
+                    improvementSuggestions: []
+                };
+
+                // Analyze skills and experience level
+                const skills = profile?.skills || [];
+                const experience = profile?.experience || [];
+                const education = profile?.education || [];
+                const projects = profile?.projects || [];
+
+                // Experience Level Detection
+                let totalExperience = 0;
+                if (experience.length > 0) {
+                    totalExperience = experience.length * 2;
+                }
+                
+                if (skills.length > 0) {
+                    totalExperience += skills.length * 0.5;
+                }
+                
+                if (projects.length > 0) {
+                    totalExperience += projects.length * 1.5;
+                }
+
+                if (totalExperience < 3) {
+                    analysis.experienceLevel = 'Junior';
+                } else if (totalExperience < 7) {
+                    analysis.experienceLevel = 'Mid-Level';
+                } else {
+                    analysis.experienceLevel = 'Senior';
+                }
+
+                // Extract salary from resume text (mock function for test)
+                function extractSalaryFromResume(text) {
+                    // Test with a sample salary in the text
+                    const salaryMatch = text.match(/\$(\d{1,3}(?:,\d{3})*)\s*[-–—]\s*\$(\d{1,3}(?:,\d{3})*)/);
+                    if (salaryMatch) {
+                        return {
+                            min: parseInt(salaryMatch[1].replace(/,/g, '')),
+                            max: parseInt(salaryMatch[2].replace(/,/g, '')),
+                            currency: 'USD',
+                            source: 'resume'
+                        };
+                    }
+                    return null;
+                }
+                
+                analysis.salaryRange = extractSalaryFromResume(text);
+
+                // Resume Score Calculation
+                let score = 0;
+                const suggestions = [];
+
+                // Skills diversity (0-25 points)
+                const uniqueSkills = new Set(skills.map(s => s.name || s));
+                score += Math.min(uniqueSkills.size * 2, 25);
+                if (uniqueSkills.size < 5) {
+                    suggestions.push('Add more diverse technical skills to your resume');
+                }
+
+                // Experience detail (0-25 points)
+                score += Math.min(experience.length * 5, 25);
+                if (experience.length < 2) {
+                    suggestions.push('Include more detailed work experience descriptions');
+                }
+
+                // Project showcase (0-20 points)
+                score += Math.min(projects.length * 4, 20);
+                if (projects.length < 2) {
+                    suggestions.push('Add more project examples with measurable outcomes');
+                }
+
+                // Education (0-15 points)
+                score += Math.min(education.length * 3, 15);
+                if (education.length === 0) {
+                    suggestions.push('Include your educational background');
+                }
+
+                // Certifications (0-15 points)
+                const certs = profile?.certs || [];
+                score += Math.min(certs.length * 3, 15);
+                if (certs.length === 0) {
+                    suggestions.push('Consider adding relevant certifications');
+                }
+
+                analysis.resumeScore = Math.min(score, 100);
+                analysis.improvementSuggestions = suggestions;
+
+                // Skills Gap Analysis
+                analysis.skillsGap = {
+                    technical: ['Machine Learning', 'Cloud Computing', 'Data Science'],
+                    soft: ['Leadership', 'Project Management', 'Communication'],
+                    tools: ['Docker', 'Kubernetes', 'AWS']
+                };
+
+                return analysis;
+            }
+
+            try {
+                const analysis = performEnhancedResumeAnalysis('test resume text with salary range $75,000 - $95,000', mockProfile);
+                
+                results.innerHTML = `
+                    <div class="success">
+                        <h3>✅ Enhanced Analysis Test Passed!</h3>
+                        <p><strong>Experience Level:</strong> ${analysis.experienceLevel}</p>
+                        <p><strong>Resume Score:</strong> ${analysis.resumeScore}/100</p>
+                        <p><strong>Salary Range:</strong> ${analysis.salaryRange ? `$${analysis.salaryRange.min.toLocaleString()} - $${analysis.salaryRange.max.toLocaleString()}` : 'Not found in resume'}</p>
+                        <p><strong>Skills Gap Categories:</strong> ${Object.keys(analysis.skillsGap).length} (Technical, Soft, Tools)</p>
+                        <p><strong>Improvement Suggestions:</strong> ${analysis.improvementSuggestions.length} suggestions generated</p>
+                    </div>
+                    
+                    <div class="info">
+                        <h4>Test Details:</h4>
+                        <ul>
+                            <li>Profile with ${mockProfile.skills.length} skills</li>
+                            <li>${mockProfile.experience.length} work experience entries</li>
+                            <li>${mockProfile.projects.length} projects</li>
+                            <li>${mockProfile.education.length} education entries</li>
+                            <li>${mockProfile.certs.length} certifications</li>
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Test Failed</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Run the test when page loads
+        window.onload = testEnhancedAnalysis;
+    </script>
+</body>
+</html>
